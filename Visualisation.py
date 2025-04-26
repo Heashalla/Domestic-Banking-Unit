@@ -1,5 +1,4 @@
-# streamlit_app.py
-
+# 1. Import libraries
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -7,22 +6,37 @@ import plotly.graph_objects as go
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-# Set page config
+# 2. Set Streamlit page config
 st.set_page_config(page_title="Sri Lanka Bank Dashboard", layout="wide")
 
-# App title
+# 3. App title
 st.title("🏦 Sri Lanka Banks: Assets vs Liabilities Dashboard")
 
-# Load data (NO upload, automatic loading)
+# 🚀 4. Load assets and liabilities CSVs (DIRECT LOAD — no upload)
 assets_df = pd.read_csv("assets_data_cleaned.csv")
 liabilities_df = pd.read_csv("liabilties_data_cleaned.csv")
 
-# Merge datasets if they have a common key (optional)
-# Example if both datasets have "Date" column
+# 5. Prepare the combined data
 if "Date" in assets_df.columns and "Date" in liabilities_df.columns:
-    combined_df = pd.merge(assets_df, liabilities_df, on="Date", how="inner")
+    # Make sure Date columns are datetime
+    assets_df["Date"] = pd.to_datetime(assets_df["Date"])
+    liabilities_df["Date"] = pd.to_datetime(liabilities_df["Date"])
+    
+    # Sum numeric values
+    assets_df["Total Assets"] = assets_df.select_dtypes(include=["float64", "int64"]).sum(axis=1)
+    liabilities_df["Total Liabilities"] = liabilities_df.select_dtypes(include=["float64", "int64"]).sum(axis=1)
+    
+    # Merge only needed columns
+    combined_df = pd.merge(
+        assets_df[["Date", "Total Assets"]],
+        liabilities_df[["Date", "Total Liabilities"]],
+        on="Date",
+        how="inner"
+    )
+    # Create a new column for Asset-to-Liability Ratio
+    combined_df["Assets/Liabilities Ratio"] = combined_df["Total Assets"] / combined_df["Total Liabilities"]
 else:
-    combined_df = pd.concat([assets_df, liabilities_df], axis=1)
+    st.error("Date column missing in one or both files. Cannot create combined analysis.")
 
 # Sidebar options
 st.sidebar.header("Options")
