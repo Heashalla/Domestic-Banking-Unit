@@ -30,22 +30,22 @@ def sri_lanka_flag_background():
         }
 
         [data-testid="stSidebar"] {
-            background: linear-gradient(
-                135deg,
-                #c49a6c 0%,   /* Softer bronze */
-                #FFD700 50%,  /* Gold */
-                #c49a6c 100%
-            );
-            border: 2px solid #8D1B1B; /* Dark Red Border */
-            border-radius: 15px;
-            padding: 15px;
-            margin: 10px;
-            color: black; /* Sidebar text color */
-            font-weight: bold;
-            height: 100vh; /* Attempt to make it full viewport height initially */
-            position: sticky; /* Keep it in view during scrolling */
-            top: 0;
-        }
+    background: linear-gradient(
+        135deg,
+        #c49a6c 0%,   
+        #FFD700 50%,  
+        #c49a6c 100%
+    );
+    border: 2px solid #8D1B1B;
+    border-radius: 20px; /* slightly more rounded */
+    padding: 20px;
+    margin: 60px 10px 10px 10px; /* top margin added */
+    color: black;
+    font-weight: bold;
+    height: auto; /* let the sidebar height grow naturally */
+    position: relative; /* not sticky */
+}
+
 
         [data-testid="stSidebar"] .css-ng1t4o {
             color: black; /* Force sidebar widgets text to black */
