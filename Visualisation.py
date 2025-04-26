@@ -16,8 +16,8 @@ st.title("📊 Bank Assets and Liabilities Visualization")
 
 # Upload files
 st.sidebar.header("Upload your CSV files")
-assets_file = st.sidebar.file_uploader("Upload Assets CSV", type=["csv"])
-liabilities_file = st.sidebar.file_uploader("Upload Liabilities CSV", type=["csv"])
+assets_file = st.sidebar.file_uploader("assets_data_cleaned.csv", type=["csv"])
+liabilities_file = st.sidebar.file_uploader("liabilties_data_cleaned.csv", type=["csv"])
 
 # Load data
 if assets_file is not None and liabilities_file is not None:
