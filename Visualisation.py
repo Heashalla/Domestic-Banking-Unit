@@ -163,7 +163,7 @@ st.markdown(
     }
     </style>
     <a href="https://www.cbsl.gov.lk/en/statistics/statistical-tables/monetary-sector" target="_blank">
-        <img src="https://en.wikipedia.org/wiki/File:Central_Bank_of_Sri_Lanka_logo.png">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Flag_of_Sri_Lanka.svg/320px-Flag_of_Sri_Lanka.svg.png" class="floating-flag">
     </a>
     """,
     unsafe_allow_html=True
