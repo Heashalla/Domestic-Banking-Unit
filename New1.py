@@ -173,11 +173,67 @@ else:
 # 🔍 Insights Section
 st.subheader(f"🔎 Correlation Insights ({selected_year})")
 
+# 🔍 Insights Section
+st.subheader(f"🔎 Correlation Insights ({selected_year})")
+
 if numeric_cols:
-    st.write("### 🔵 Correlation Heatmap")
-    fig, ax = plt.subplots(figsize=(10, 6))
-    sns.heatmap(df[numeric_cols].corr(), annot=True, cmap="coolwarm", ax=ax)
-    st.pyplot(fig)
+    corr_matrix = df[numeric_cols].corr()
+
+    # Create 4 columns
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        st.write("### 🔵 Heatmap (Seaborn)")
+        fig, ax = plt.subplots(figsize=(4, 4))
+        sns.heatmap(corr_matrix, annot=True, cmap="coolwarm", ax=ax, cbar=False)
+        st.pyplot(fig)
+
+    with col2:
+        st.write("### 🔵 Heatmap (Plotly)")
+        fig2 = px.imshow(
+            corr_matrix,
+            text_auto=True,
+            color_continuous_scale="RdBu",
+            origin="lower",
+            title="",
+            aspect="auto",
+        )
+        fig2.update_layout(margin=dict(l=20, r=20, t=20, b=20))
+        st.plotly_chart(fig2, use_container_width=True)
+
+    with col3:
+        st.write("### 🔵 Diverging Correlation Bars")
+        corr_unstacked = corr_matrix.iloc[:, 0].sort_values()
+        fig3 = px.bar(
+            corr_unstacked,
+            orientation='h',
+            color=corr_unstacked,
+            color_continuous_scale='RdBu',
+            title="",
+        )
+        fig3.update_layout(xaxis_title="Correlation with " + corr_unstacked.index[0])
+        st.plotly_chart(fig3, use_container_width=True)
+
+    with col4:
+        st.write("### 🔵 Correlation Network")
+        import networkx as nx
+
+        G = nx.Graph()
+        threshold = 0.5  # Only strong correlations
+
+        for i in corr_matrix.columns:
+            for j in corr_matrix.columns:
+                if i != j and abs(corr_matrix.loc[i, j]) > threshold:
+                    G.add_edge(i, j, weight=corr_matrix.loc[i, j])
+
+        fig4 = plt.figure(figsize=(4, 4))
+        pos = nx.spring_layout(G, seed=42)
+        edges = G.edges()
+        weights = [G[u][v]['weight'] for u,v in edges]
+
+        nx.draw(G, pos, with_labels=True, edge_color=weights, edge_cmap=plt.cm.RdBu, node_color='skyblue', node_size=700, font_size=8)
+        st.pyplot(fig4)
+
 else:
     st.info("No numeric data available for correlation analysis.")
 
