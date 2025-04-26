@@ -1,49 +1,5 @@
 # streamlit_app.py
 
-# 🚀 Imports
-import streamlit as st
-import pandas as pd
-import plotly.express as px
-import seaborn as sns
-import matplotlib.pyplot as plt
-import calendar
-
-# 🚀 FIRST: Page setup (must be FIRST Streamlit command!)
-st.set_page_config(page_title="Sri Lanka Banks Dashboard", layout="wide")
-
-# 🇱🇰 THEN: Set Sri Lanka Flag Colors as Background
-def sri_lanka_flag_background():
-    st.markdown(
-        """
-        <style>
-        .stApp {
-            background: linear-gradient(
-                135deg,
-                #8D1B1B 0%,
-                #FFD700 25%,
-                #007847 50%,
-                #FF8200 75%,
-                #8D1B1B 100%
-            );
-            background-size: 400% 400%;
-            animation: gradientAnimation 15s ease infinite;
-        }
-
-        @keyframes gradientAnimation {
-            0% {background-position: 0% 50%;}
-            50% {background-position: 100% 50%;}
-            100% {background-position: 0% 50%;}
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-# 🎨 Apply Background
-sri_lanka_flag_background()
-
-# streamlit_app.py
-
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -51,7 +7,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 # 🚀 Page setup
-st.set_page_config(page_title="Sri Lanka Banks Dashboard", layout="wide")
+st.set_page_config(page_title="Bank Assets and Liabilities Dashboard", layout="wide")
 st.title("🏦 Sri Lanka Banks: Assets & Liabilities Dashboard")
 
 # 📥 Load data
