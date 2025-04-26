@@ -6,73 +6,71 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
 
-# 🚨 set_page_config must be first Streamlit command
-st.set_page_config(page_title="Bank Assets and Liabilities Dashboard", layout="wide")
+# Set Streamlit page config
+st.set_page_config(page_title="Sri Lanka Financial Dashboard", layout="wide")
 
-# App title
-st.title("📊 Bank Assets and Liabilities Dashboard")
+# Load datasets
+assets = pd.read_csv("assets_data_cleaned.csv")
+liabilities = pd.read_csv("liabilties_data_cleaned.csv")
 
-# Sidebar for uploading files
-st.sidebar.header("Upload CSV Files")
+# Preprocessing: Assume both datasets have a 'Year' column to merge
+assets['Type'] = 'Asset'
+liabilities['Type'] = 'Liability'
 
-assets_file = st.sidebar.file_uploader("Upload Assets CSV", type=["csv"])
-liabilities_file = st.sidebar.file_uploader("Upload Liabilities CSV", type=["csv"])
+# Combine datasets
+combined = pd.concat([assets, liabilities], ignore_index=True)
 
-# Load data
-if assets_file and liabilities_file:
-    assets_df = pd.read_csv(assets_file)
-    liabilities_df = pd.read_csv(liabilities_file)
+# Sidebar filters
+st.sidebar.header("Filter Data")
+selected_year = st.sidebar.selectbox("Select Year", combined['Year'].unique())
 
-    # Sidebar filters
-    st.sidebar.header("Visualization Settings")
-    dataset_choice = st.sidebar.radio("Select Dataset", ("Assets", "Liabilities"))
+# Filtered data
+filtered_data = combined[combined['Year'] == selected_year]
 
-    # Set data based on choice
-    if dataset_choice == "Assets":
-        df = assets_df
-    else:
-        df = liabilities_df
+# KPIs
+total_assets = assets[assets['Year'] == selected_year]['Value'].sum()
+total_liabilities = liabilities[liabilities['Year'] == selected_year]['Value'].sum()
+net_worth = total_assets - total_liabilities
 
-    numeric_columns = df.select_dtypes(include=["float64", "int64"]).columns.tolist()
-    all_columns = df.columns.tolist()
+# Display KPIs
+st.title("Sri Lanka Financial Dashboard")
+col1, col2, col3 = st.columns(3)
 
-    # Filter options
-    st.sidebar.subheader("Filter Data")
-    selected_columns = st.sidebar.multiselect("Select columns to display", all_columns, default=all_columns)
+col1.metric("Total Assets", f"LKR {total_assets:,.2f}")
+col2.metric("Total Liabilities", f"LKR {total_liabilities:,.2f}")
+col3.metric("Net Worth", f"LKR {net_worth:,.2f}")
 
-    # Tabs for better navigation
-    tab1, tab2, tab3 = st.tabs(["📄 Data Table", "📈 Charts", "🔎 Data Exploration"])
+# Advanced Analysis: Asset to Liability Ratio
+try:
+    ratio = total_assets / total_liabilities
+except ZeroDivisionError:
+    ratio = 0
+st.subheader(f"Asset to Liability Ratio in {selected_year}: {ratio:.2f}")
 
-    with tab1:
-        st.subheader(f"{dataset_choice} - Data Table")
-        st.dataframe(df[selected_columns])
+# Trend Analysis (across years)
+st.subheader("Trend Over Time")
+trend_data = combined.groupby(['Year', 'Type'])['Value'].sum().reset_index()
+fig_trend = px.line(trend_data, x='Year', y='Value', color='Type', markers=True)
+st.plotly_chart(fig_trend, use_container_width=True)
 
-    with tab2:
-        st.subheader(f"{dataset_choice} - Visualizations")
+# Breakdown by Category (if available)
+if 'Category' in combined.columns:
+    st.subheader("Category-wise Breakdown")
+    col4, col5 = st.columns(2)
 
-        if numeric_columns:
-            selected_col = st.selectbox("Select a numeric column to visualize", numeric_columns)
+    asset_cat = assets[assets['Year'] == selected_year]
+    liability_cat = liabilities[liabilities['Year'] == selected_year]
 
-            # Line Chart
-            st.plotly_chart(px.line(df, y=selected_col, title=f"Line Chart of {selected_col}"))
+    fig_asset_cat = px.pie(asset_cat, names='Category', values='Value', title='Assets by Category')
+    fig_liability_cat = px.pie(liability_cat, names='Category', values='Value', title='Liabilities by Category')
 
-            # Histogram
-            st.plotly_chart(px.histogram(df, x=selected_col, nbins=30, title=f"Histogram of {selected_col}"))
+    col4.plotly_chart(fig_asset_cat, use_container_width=True)
+    col5.plotly_chart(fig_liability_cat, use_container_width=True)
 
-            # Box Plot
-            st.plotly_chart(px.box(df, y=selected_col, title=f"Box Plot of {selected_col}"))
-        else:
-            st.warning("No numeric columns found for visualization.")
+# Raw Data View
+with st.expander("See Raw Data"):
+    st.dataframe(filtered_data)
 
-    with tab3:
-        st.subheader(f"{dataset_choice} - Basic Data Exploration")
-
-        st.write("**Summary Statistics**")
-        st.dataframe(df.describe())
-
-        st.write("**Missing Values**")
-        missing = df.isnull().sum()
-        st.dataframe(missing[missing > 0])
-
-else:
-    st.info("⬅️ Please upload both Assets and Liabilities CSV files to start.")
+# Footer
+st.markdown("---")
+st.caption("Developed for 5DATA004W - University of Westminster")
