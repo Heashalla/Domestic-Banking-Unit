@@ -2,77 +2,107 @@
 
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 import plotly.express as px
+import plotly.graph_objects as go
+import seaborn as sns
+import matplotlib.pyplot as plt
 
-# 🚨 set_page_config must be first Streamlit command
-st.set_page_config(page_title="Bank Assets and Liabilities Dashboard", layout="wide")
+# Set page config
+st.set_page_config(page_title="Sri Lanka Bank Dashboard", layout="wide")
 
 # App title
-st.title("📊 Bank Assets and Liabilities Dashboard")
+st.title("🏦 Sri Lanka Banks: Assets vs Liabilities Dashboard")
 
-# Sidebar for uploading files
-st.sidebar.header("Upload CSV Files")
+# Load data (NO upload, automatic loading)
+assets_df = pd.read_csv("assets_data_cleaned.csv")
+liabilities_df = pd.read_csv("liabilties_data_cleaned.csv")
 
-assets_file = st.sidebar.file_uploader("Upload Assets CSV", type=["csv"])
-liabilities_file = st.sidebar.file_uploader("Upload Liabilities CSV", type=["csv"])
-
-# Load data
-if assets_file and liabilities_file:
-    assets_df = pd.read_csv(assets_file)
-    liabilities_df = pd.read_csv(liabilities_file)
-
-    # Sidebar filters
-    st.sidebar.header("Visualization Settings")
-    dataset_choice = st.sidebar.radio("Select Dataset", ("Assets", "Liabilities"))
-
-    # Set data based on choice
-    if dataset_choice == "Assets":
-        df = assets_df
-    else:
-        df = liabilities_df
-
-    numeric_columns = df.select_dtypes(include=["float64", "int64"]).columns.tolist()
-    all_columns = df.columns.tolist()
-
-    # Filter options
-    st.sidebar.subheader("Filter Data")
-    selected_columns = st.sidebar.multiselect("Select columns to display", all_columns, default=all_columns)
-
-    # Tabs for better navigation
-    tab1, tab2, tab3 = st.tabs(["📄 Data Table", "📈 Charts", "🔎 Data Exploration"])
-
-    with tab1:
-        st.subheader(f"{dataset_choice} - Data Table")
-        st.dataframe(df[selected_columns])
-
-    with tab2:
-        st.subheader(f"{dataset_choice} - Visualizations")
-
-        if numeric_columns:
-            selected_col = st.selectbox("Select a numeric column to visualize", numeric_columns)
-
-            # Line Chart
-            st.plotly_chart(px.line(df, y=selected_col, title=f"Line Chart of {selected_col}"))
-
-            # Histogram
-            st.plotly_chart(px.histogram(df, x=selected_col, nbins=30, title=f"Histogram of {selected_col}"))
-
-            # Box Plot
-            st.plotly_chart(px.box(df, y=selected_col, title=f"Box Plot of {selected_col}"))
-        else:
-            st.warning("No numeric columns found for visualization.")
-
-    with tab3:
-        st.subheader(f"{dataset_choice} - Basic Data Exploration")
-
-        st.write("**Summary Statistics**")
-        st.dataframe(df.describe())
-
-        st.write("**Missing Values**")
-        missing = df.isnull().sum()
-        st.dataframe(missing[missing > 0])
-
+# Merge datasets if they have a common key (optional)
+# Example if both datasets have "Date" column
+if "Date" in assets_df.columns and "Date" in liabilities_df.columns:
+    combined_df = pd.merge(assets_df, liabilities_df, on="Date", how="inner")
 else:
-    st.info("⬅️ Please upload both Assets and Liabilities CSV files to start.")
+    combined_df = pd.concat([assets_df, liabilities_df], axis=1)
+
+# Sidebar options
+st.sidebar.header("Options")
+view_option = st.sidebar.radio("Select View", ["Assets", "Liabilities", "Combined Analysis"])
+
+# KPI Section
+st.subheader("🔑 Key Performance Indicators")
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    total_assets = assets_df.select_dtypes(include=["float64", "int64"]).sum().sum()
+    st.metric("Total Assets", f"{total_assets:,.0f}")
+
+with col2:
+    total_liabilities = liabilities_df.select_dtypes(include=["float64", "int64"]).sum().sum()
+    st.metric("Total Liabilities", f"{total_liabilities:,.0f}")
+
+with col3:
+    ratio = total_assets / total_liabilities if total_liabilities != 0 else 0
+    st.metric("Assets to Liabilities Ratio", f"{ratio:.2f}")
+
+# Tabs for content
+tab1, tab2, tab3 = st.tabs(["📊 Data Table", "📈 Charts", "🔍 Insights"])
+
+with tab1:
+    st.subheader(f"{view_option} Data Table")
+    if view_option == "Assets":
+        st.dataframe(assets_df)
+    elif view_option == "Liabilities":
+        st.dataframe(liabilities_df)
+    else:
+        st.dataframe(combined_df)
+
+with tab2:
+    st.subheader(f"{view_option} Charts")
+
+    if view_option == "Assets":
+        numeric_cols = assets_df.select_dtypes(include=["float64", "int64"]).columns.tolist()
+        selected_col = st.selectbox("Select a column to visualize", numeric_cols)
+        st.plotly_chart(px.line(assets_df, x=assets_df.index, y=selected_col, title=f"Assets - {selected_col} Trend"))
+
+    elif view_option == "Liabilities":
+        numeric_cols = liabilities_df.select_dtypes(include=["float64", "int64"]).columns.tolist()
+        selected_col = st.selectbox("Select a column to visualize", numeric_cols)
+        st.plotly_chart(px.line(liabilities_df, x=liabilities_df.index, y=selected_col, title=f"Liabilities - {selected_col} Trend"))
+
+    else:
+        if "Date" in combined_df.columns:
+            combined_df["Date"] = pd.to_datetime(combined_df["Date"])
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(x=combined_df["Date"], y=assets_df.select_dtypes(include=["float64", "int64"]).sum(axis=1),
+                                     mode="lines", name="Assets"))
+            fig.add_trace(go.Scatter(x=combined_df["Date"], y=liabilities_df.select_dtypes(include=["float64", "int64"]).sum(axis=1),
+                                     mode="lines", name="Liabilities"))
+            fig.update_layout(title="Assets vs Liabilities Over Time")
+            st.plotly_chart(fig)
+        else:
+            st.warning("No Date column available for time series chart.")
+
+with tab3:
+    st.subheader(f"{view_option} Insights")
+
+    if view_option == "Combined Analysis":
+        st.markdown("### Correlation Heatmap (Assets + Liabilities)")
+        corr = combined_df.corr()
+        fig, ax = plt.subplots(figsize=(10,8))
+        sns.heatmap(corr, annot=True, cmap="coolwarm", ax=ax)
+        st.pyplot(fig)
+
+        st.markdown("### Assets vs Liabilities Distribution")
+        fig2 = go.Figure(data=[
+            go.Bar(name="Assets", x=assets_df.columns, y=assets_df.sum()),
+            go.Bar(name="Liabilities", x=liabilities_df.columns, y=liabilities_df.sum())
+        ])
+        fig2.update_layout(barmode='group')
+        st.plotly_chart(fig2)
+
+    else:
+        st.info("Select 'Combined Analysis' to view advanced insights.")
+
+# Footer
+st.caption("Developed for Data Science Project Lifecycle Coursework 5DATA004W | University of Westminster")
