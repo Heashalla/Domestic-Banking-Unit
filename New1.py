@@ -11,7 +11,7 @@ import calendar
 # 🚀 FIRST: Page setup (must be FIRST Streamlit command!)
 st.set_page_config(page_title="Sri Lanka Banks Dashboard", layout="wide")
 
-# 🇱🇰 Set Sri Lanka Flag Colors as Background
+# 🇱🇰 THEN: Set Sri Lanka Flag Colors as Background
 def sri_lanka_flag_background():
     st.markdown(
         """
@@ -39,11 +39,19 @@ def sri_lanka_flag_background():
         unsafe_allow_html=True
     )
 
-# Call the background function
+# 🎨 Apply Background
 sri_lanka_flag_background()
 
+# streamlit_app.py
+
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 # 🚀 Page setup
-st.set_page_config(page_title="Bank Assets and Liabilities Dashboard", layout="wide")
+st.set_page_config(page_title="Sri Lanka Banks Dashboard", layout="wide")
 st.title("🏦 Sri Lanka Banks: Assets & Liabilities Dashboard")
 
 # 📥 Load data
