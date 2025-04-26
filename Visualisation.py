@@ -42,6 +42,9 @@ def sri_lanka_flag_background():
             margin: 10px;
             color: black; /* Sidebar text color */
             font-weight: bold;
+            height: 100vh; /* Attempt to make it full viewport height initially */
+            position: sticky; /* Keep it in view during scrolling */
+            top: 0;
         }
 
         [data-testid="stSidebar"] .css-ng1t4o {
@@ -61,6 +64,27 @@ def sri_lanka_flag_background():
 
 # 🎨 Apply Background
 sri_lanka_flag_background()
+
+# JavaScript to dynamically adjust sidebar height
+st.markdown(
+    """
+    <script>
+    function setSidebarHeight() {
+        const sidebar = document.querySelector('[data-testid="stSidebar"]');
+        const mainContent = document.querySelector('.stApp > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(2)');
+        if (sidebar && mainContent) {
+            sidebar.style.minHeight = mainContent.offsetHeight + 'px';
+        }
+    }
+    window.addEventListener('load', setSidebarHeight);
+    window.addEventListener('resize', setSidebarHeight);
+    const observer = new MutationObserver(setSidebarHeight);
+    observer.observe(document.body, { childList: true, subtree: true });
+    </script>
+    """,
+    unsafe_allow_html=True,
+)
+
 
 # 🏦 Title and Description
 st.title("🏦 🇱🇰 Sri Lanka Banks: Domestic Banking Insights")
@@ -130,19 +154,19 @@ if numeric_cols:
     chart1, chart2 = st.columns(2)
     with chart1:
         st.plotly_chart(px.line(df, x=filter_col, y=selected_col,
-                                title=f"{selected_col} Trend Line",
-                                template="plotly_dark",
-                                markers=True), use_container_width=True)
+                                        title=f"{selected_col} Trend Line",
+                                        template="plotly_dark",
+                                        markers=True), use_container_width=True)
 
     with chart2:
         st.plotly_chart(px.area(df, x=filter_col, y=selected_col,
-                                title=f"{selected_col} Area Chart",
-                                template="simple_white"), use_container_width=True)
+                                        title=f"{selected_col} Area Chart",
+                                        template="simple_white"), use_container_width=True)
 
     if df[selected_col].nunique() > 1:
         st.plotly_chart(px.box(df, y=selected_col,
-                               title=f"{selected_col} Value Spread",
-                               template="ggplot2"), use_container_width=True)
+                                        title=f"{selected_col} Value Spread",
+                                        template="ggplot2"), use_container_width=True)
 else:
     st.warning("No numeric columns available to visualize.")
 
@@ -160,7 +184,7 @@ if numeric_cols:
         pie_df = df[[selected_col]].copy()
         pie_df["Label"] = pie_df.index.astype(str)
         st.plotly_chart(px.pie(pie_df, names="Label", values=selected_col,
-                               title=f"{selected_col} Distribution"), use_container_width=True)
+                                        title=f"{selected_col} Distribution"), use_container_width=True)
 
 else:
     st.info("No numeric data available for insights.")
