@@ -176,44 +176,40 @@ st.subheader(f"🔎 Correlation Insights ({selected_year})")
 if numeric_cols:
     corr_matrix = df[numeric_cols].corr()
 
-    # Create 2 columns for the 2 charts
-    col1, col2 = st.columns(2)
+    # 🔵 Plotly Heatmap
+    st.write("### 🔵 Correlation Heatmap (Plotly)")
+    fig2 = px.imshow(
+        corr_matrix,
+        text_auto=True,
+        color_continuous_scale="RdBu",
+        origin="lower",
+        title="",
+        aspect="auto",
+    )
+    fig2.update_layout(
+        margin=dict(l=20, r=20, t=30, b=20),
+        coloraxis_colorbar=dict(title="Correlation")
+    )
+    st.plotly_chart(fig2, use_container_width=True)
 
-    with col1:
-        st.write("### 🔵 Correlation Heatmap (Plotly)")
-        fig2 = px.imshow(
-            corr_matrix,
-            text_auto=True,
-            color_continuous_scale="RdBu",
-            origin="lower",
-            title="",
-            aspect="auto",
-        )
-        fig2.update_layout(
-            margin=dict(l=20, r=20, t=30, b=20),
-            coloraxis_colorbar=dict(title="Correlation")
-        )
-        st.plotly_chart(fig2, use_container_width=True)
+    # 🔵 Diverging Correlation Bars
+    st.write("### 🔵 Diverging Correlation Bars")
+    reference_var = numeric_cols[0]
+    corr_unstacked = corr_matrix[reference_var].sort_values()
 
-    with col2:
-        st.write("### 🔵 Diverging Correlation Bars")
-        # Choose a reference variable (for example: the first numeric column)
-        reference_var = numeric_cols[0]
-        corr_unstacked = corr_matrix[reference_var].sort_values()
-
-        fig3 = px.bar(
-            corr_unstacked,
-            orientation='h',
-            color=corr_unstacked,
-            color_continuous_scale='RdBu',
-            title=f"Correlation with {reference_var}",
-        )
-        fig3.update_layout(
-            xaxis_title="Correlation Strength",
-            yaxis_title="Variable",
-            margin=dict(l=20, r=20, t=30, b=20)
-        )
-        st.plotly_chart(fig3, use_container_width=True)
+    fig3 = px.bar(
+        corr_unstacked,
+        orientation='h',
+        color=corr_unstacked,
+        color_continuous_scale='RdBu',
+        title=f"Correlation with {reference_var}",
+    )
+    fig3.update_layout(
+        xaxis_title="Correlation Strength",
+        yaxis_title="Variable",
+        margin=dict(l=20, r=20, t=30, b=20)
+    )
+    st.plotly_chart(fig3, use_container_width=True)
 
 else:
     st.info("No numeric data available for correlation analysis.")
