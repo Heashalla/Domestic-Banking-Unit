@@ -176,17 +176,11 @@ st.subheader(f"🔎 Correlation Insights ({selected_year})")
 if numeric_cols:
     corr_matrix = df[numeric_cols].corr()
 
-    # Create 4 columns
-    col1, col2, col3, col4 = st.columns(4)
+    # Create 2 columns for the 2 charts
+    col1, col2 = st.columns(2)
 
     with col1:
-        st.write("### 🔵 Heatmap (Seaborn)")
-        fig, ax = plt.subplots(figsize=(4, 4))
-        sns.heatmap(corr_matrix, annot=True, cmap="coolwarm", ax=ax, cbar=False)
-        st.pyplot(fig)
-
-    with col2:
-        st.write("### 🔵 Heatmap (Plotly)")
+        st.write("### 🔵 Correlation Heatmap (Plotly)")
         fig2 = px.imshow(
             corr_matrix,
             text_auto=True,
@@ -195,41 +189,31 @@ if numeric_cols:
             title="",
             aspect="auto",
         )
-        fig2.update_layout(margin=dict(l=20, r=20, t=20, b=20))
+        fig2.update_layout(
+            margin=dict(l=20, r=20, t=30, b=20),
+            coloraxis_colorbar=dict(title="Correlation")
+        )
         st.plotly_chart(fig2, use_container_width=True)
 
-    with col3:
+    with col2:
         st.write("### 🔵 Diverging Correlation Bars")
-        corr_unstacked = corr_matrix.iloc[:, 0].sort_values()
+        # Choose a reference variable (for example: the first numeric column)
+        reference_var = numeric_cols[0]
+        corr_unstacked = corr_matrix[reference_var].sort_values()
+
         fig3 = px.bar(
             corr_unstacked,
             orientation='h',
             color=corr_unstacked,
             color_continuous_scale='RdBu',
-            title="",
+            title=f"Correlation with {reference_var}",
         )
-        fig3.update_layout(xaxis_title="Correlation with " + corr_unstacked.index[0])
+        fig3.update_layout(
+            xaxis_title="Correlation Strength",
+            yaxis_title="Variable",
+            margin=dict(l=20, r=20, t=30, b=20)
+        )
         st.plotly_chart(fig3, use_container_width=True)
-
-    with col4:
-        st.write("### 🔵 Correlation Network")
-        import networkx as nx
-
-        G = nx.Graph()
-        threshold = 0.5  # Only strong correlations
-
-        for i in corr_matrix.columns:
-            for j in corr_matrix.columns:
-                if i != j and abs(corr_matrix.loc[i, j]) > threshold:
-                    G.add_edge(i, j, weight=corr_matrix.loc[i, j])
-
-        fig4 = plt.figure(figsize=(4, 4))
-        pos = nx.spring_layout(G, seed=42)
-        edges = G.edges()
-        weights = [G[u][v]['weight'] for u,v in edges]
-
-        nx.draw(G, pos, with_labels=True, edge_color=weights, edge_cmap=plt.cm.RdBu, node_color='skyblue', node_size=700, font_size=8)
-        st.pyplot(fig4)
 
 else:
     st.info("No numeric data available for correlation analysis.")
