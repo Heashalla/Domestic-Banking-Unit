@@ -63,13 +63,6 @@ filter_col = "End of Period"  # Adjust this if your actual column name is slight
 st.sidebar.header("🔧 Controls")
 dataset_choice = st.sidebar.radio("Select Dataset", ["Assets", "Liabilities"])
 
-# 🧠 Identify shared filter column
-filter_col = "End of Period"  # Adjust if your actual column name differs
-
-# 📦 Sidebar controls
-st.sidebar.header("🔧 Controls")
-dataset_choice = st.sidebar.radio("Select Dataset", ["Assets", "Liabilities"])
-
 # 🎯 Select dataset
 if dataset_choice == "Assets":
     df = assets_df.copy()
@@ -78,25 +71,13 @@ else:
     df = liabilities_df.copy()
     dataset_title = "Liabilities"
 
-# 📆 Filter by Year and Month separately
+# 📆 Filter by End of Period
 if filter_col in df.columns:
     df[filter_col] = pd.to_datetime(df[filter_col], errors='coerce')
     df = df.dropna(subset=[filter_col])
-
-    # Extract Year and Month
-    df['Year'] = df[filter_col].dt.year
-    df['Month'] = df[filter_col].dt.month_name()
-
-    # Sidebar Filter - Year First
-    selected_year = st.sidebar.selectbox("Select Year", sorted(df['Year'].unique(), reverse=True))
-
-    # Sidebar Filter - Then Month
-    available_months = df[df['Year'] == selected_year]['Month'].unique()
-    selected_month = st.sidebar.selectbox("Select Month", sorted(available_months))
-
-    # Apply filtering based on Year and Month
-    df = df[(df['Year'] == selected_year) & (df['Month'] == selected_month)]
-
+    unique_dates = sorted(df[filter_col].dt.to_period('M').astype(str).unique())
+    selected_date = st.sidebar.selectbox("Filter by End of Period", unique_dates)
+    df = df[df[filter_col].dt.to_period('M').astype(str) == selected_date]
 
 # 📊 KPI Section
 st.subheader(f"🔑 {dataset_title} Key Stats ({selected_date})")
