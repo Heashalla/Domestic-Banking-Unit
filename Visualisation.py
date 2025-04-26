@@ -41,6 +41,46 @@ def sri_lanka_flag_background():
 
 # 🎨 Apply background
 sri_lanka_flag_background()
+    
+def sri_lanka_flag_background():
+    st.markdown(
+        """
+        <style>
+        .stApp {
+            background: linear-gradient(
+                135deg,
+                #8D1B1B 0%,
+                #FFD700 25%,
+                #007847 50%,
+                #FF8200 75%,
+                #8D1B1B 100%
+            );
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
+        }
+        
+        [data-testid="stSidebar"] {
+            background: linear-gradient(
+                135deg,
+                #fff8dc 0%,   /* Light gold */
+                #f5deb3 50%,  /* Wheat color */
+                #fff8dc 100%
+            );
+            border: 3px solid #FFD700; /* Golden border */
+            border-radius: 15px;
+            padding: 10px;
+            margin: 10px;
+        }
+
+        @keyframes gradientAnimation {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
 # 🏦 Title and Description
 st.title("🏦 🇱🇰 Sri Lanka Banks: Domestic Banking Insights")
