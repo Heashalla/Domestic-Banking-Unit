@@ -71,14 +71,18 @@ else:
     df = liabilities_df.copy()
     dataset_title = "Liabilities"
 
-# 📆 Filter by End of Period
+# 🗓️ Sidebar - Year and Month Filters
 if filter_col in df.columns:
-    df[filter_col] = pd.to_datetime(df[filter_col], errors='coerce')
     df = df.dropna(subset=[filter_col])
-    unique_dates = sorted(df[filter_col].dt.to_period('M').astype(str).unique())
-    selected_date = st.sidebar.selectbox("Filter by End of Period", unique_dates)
-    df = df[df[filter_col].dt.to_period('M').astype(str) == selected_date]
+    df['Year'] = df[filter_col].dt.year
+    df['Month'] = df[filter_col].dt.month_name()
 
+    selected_year = st.sidebar.selectbox("Select Year", sorted(df['Year'].unique(), reverse=True))
+    available_months = df[df['Year'] == selected_year]['Month'].unique()
+    selected_month = st.sidebar.selectbox("Select Month", sorted(available_months))
+
+    df = df[(df['Year'] == selected_year) & (df['Month'] == selected_month)]
+    
 # 📊 KPI Section
 st.subheader(f"🔑 {dataset_title} Key Stats ({selected_date})")
 col1, col2 = st.columns(2)
