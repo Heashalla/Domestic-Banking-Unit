@@ -4,298 +4,135 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime
-import data_processor as dp
 
 # Set page configuration
 st.set_page_config(
-    page_title="Liabilities Analysis - Sri Lankan Financial Data Dashboard",
-    page_icon="📊",
-    layout="wide"
+    page_title="Sri Lankan Financial Data Dashboard",
+    page_icon="🇱🇰",
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-# Page title
-st.title("📊 Liabilities Analysis")
-st.markdown("Explore and analyze financial liabilities data for Sri Lanka")
+# Application title and description
+st.title("🇱🇰 Sri Lankan Financial Data Analysis Dashboard")
 
-# Check if data is loaded in session state
-if 'liabilities_df' not in st.session_state:
-    st.error("Data not loaded. Please return to the home page.")
-    st.stop()
+st.markdown("""
+This dashboard provides comprehensive analysis of Sri Lankan financial assets and liabilities data from 1995 to 2023.
+Explore various financial indicators, compare trends, and discover insights through interactive visualizations.
+""")
 
-# Get data from session state
-liabilities_df = st.session_state['liabilities_df']
-
-# Create sidebar for filtering options
-st.sidebar.header("Filter Options")
-
-# Date range filter
-min_date = liabilities_df['End of Period'].min()
-max_date = liabilities_df['End of Period'].max()
-
-start_date, end_date = st.sidebar.date_input(
-    "Select Date Range",
-    [min_date, max_date],
-    min_value=min_date,
-    max_value=max_date
-)
-
-# Filter data by date range
-filtered_df = liabilities_df[(liabilities_df['End of Period'] >= pd.Timestamp(start_date)) & 
-                            (liabilities_df['End of Period'] <= pd.Timestamp(end_date))]
-
-# Display filter info
-st.sidebar.markdown(f"**Selected Period:** {start_date.strftime('%b %Y')} - {end_date.strftime('%b %Y')}")
-st.sidebar.markdown(f"**Number of Records:** {len(filtered_df)}")
-
-# Liability categories selection
-liability_categories = dp.get_liability_categories()
-selected_categories = st.sidebar.multiselect(
-    "Select Liability Categories",
-    list(liability_categories.keys()),
-    default=list(liability_categories.keys())
-)
-
-# Visualization type selection
-viz_type = st.sidebar.selectbox(
-    "Select Visualization Type",
-    ["Time Series", "Bar Chart", "Area Chart", "Scatter Plot", "Heatmap", "Box Plot"]
-)
-
-# Get numeric columns for visualization
-numeric_cols = [col for col in filtered_df.columns if filtered_df[col].dtype in [np.float64, np.int64, float, int]]
-
-# Remove 'End of Period' if present in numeric_cols
-if 'End of Period' in numeric_cols:
-    numeric_cols.remove('End of Period')
-
-# List to store visualization metrics
-viz_metrics = []
-
-# Fill viz_metrics based on selected categories
-for category in selected_categories:
-    for pattern in liability_categories[category]:
-        matching_cols = [col for col in numeric_cols if pattern in col]
-        viz_metrics.extend(matching_cols)
-
-# Make sure we have unique metrics
-viz_metrics = list(set(viz_metrics))
-
-# Allow user to select specific metrics for detailed visualization
-selected_metrics = st.multiselect(
-    "Select Specific Metrics to Visualize",
-    viz_metrics,
-    default=viz_metrics[:5] if len(viz_metrics) > 5 else viz_metrics
-)
-
-# Main content
-st.subheader("Liabilities Trend Analysis")
-
-# Display the selected metrics visualization based on the selected visualization type
-if selected_metrics:
-    if viz_type == "Time Series":
-        fig = px.line(
-            filtered_df, 
-            x='End of Period', 
-            y=selected_metrics,
-            title="Liabilities Trends Over Time",
-            labels={'End of Period': 'Date', 'value': 'Amount'},
-            template="plotly_white"
-        )
-        st.plotly_chart(fig, use_container_width=True)
-        
-    elif viz_type == "Bar Chart":
-        # For bar chart, we'll show the average value over the selected period
-        avg_data = filtered_df[selected_metrics].mean().reset_index()
-        avg_data.columns = ['Metric', 'Average Value']
-        
-        fig = px.bar(
-            avg_data,
-            x='Metric',
-            y='Average Value',
-            title="Average Liability Values in Selected Period",
-            template="plotly_white"
-        )
-        st.plotly_chart(fig, use_container_width=True)
-        
-    elif viz_type == "Area Chart":
-        fig = px.area(
-            filtered_df,
-            x='End of Period',
-            y=selected_metrics,
-            title="Cumulative Liabilities Over Time",
-            labels={'End of Period': 'Date', 'value': 'Amount'},
-            template="plotly_white"
-        )
-        st.plotly_chart(fig, use_container_width=True)
-        
-    elif viz_type == "Scatter Plot":
-        # Choose two metrics for scatter plot
-        if len(selected_metrics) >= 2:
-            x_metric = st.selectbox("Select X-Axis Metric", selected_metrics)
-            y_metric = st.selectbox("Select Y-Axis Metric", [m for m in selected_metrics if m != x_metric])
-            
-            fig = px.scatter(
-                filtered_df,
-                x=x_metric,
-                y=y_metric,
-                title=f"Relationship Between {x_metric} and {y_metric}",
-                labels={x_metric: x_metric, y_metric: y_metric},
-                template="plotly_white",
-                trendline="ols"
-            )
-            st.plotly_chart(fig, use_container_width=True)
-        else:
-            st.warning("Please select at least two metrics for scatter plot visualization.")
-            
-    elif viz_type == "Heatmap":
-        # Create correlation matrix
-        corr_matrix = filtered_df[selected_metrics].corr()
-        
-        fig = px.imshow(
-            corr_matrix,
-            text_auto=True,
-            title="Correlation Matrix of Selected Liability Metrics",
-            template="plotly_white",
-            color_continuous_scale="RdBu_r"
-        )
-        st.plotly_chart(fig, use_container_width=True)
-        
-    elif viz_type == "Box Plot":
-        # Melt the dataframe to have metrics as a categorical variable
-        melted_df = pd.melt(
-            filtered_df, 
-            id_vars=['End of Period'],
-            value_vars=selected_metrics,
-            var_name='Metric',
-            value_name='Value'
-        )
-        
-        fig = px.box(
-            melted_df,
-            x='Metric',
-            y='Value',
-            title="Distribution of Liability Values",
-            template="plotly_white"
-        )
-        st.plotly_chart(fig, use_container_width=True)
-else:
-    st.warning("Please select at least one metric to visualize.")
-
-# Deposit composition analysis
-if any('Deposits' in metric for metric in viz_metrics):
-    st.subheader("Deposit Composition Analysis")
+# Load and process data
+try:
+    assets_df = pd.read_csv('attached_assets/assets_data_cleaned.csv')
+    liabilities_df = pd.read_csv('attached_assets/liabilties_data_cleaned.csv')
     
-    # Extract all deposit columns
-    deposit_cols = [col for col in viz_metrics if 'Deposits' in col]
+    # Convert 'End of Period' to datetime
+    assets_df['End of Period'] = pd.to_datetime(assets_df['End of Period'])
+    liabilities_df['End of Period'] = pd.to_datetime(liabilities_df['End of Period'])
     
-    # Allow user to select specific deposit types
-    selected_deposit_types = st.multiselect(
-        "Select Deposit Types to Analyze",
-        deposit_cols,
-        default=deposit_cols[:5] if len(deposit_cols) > 5 else deposit_cols
+    # Store the processed data in session state for other pages
+    st.session_state['assets_df'] = assets_df
+    st.session_state['liabilities_df'] = liabilities_df
+    
+    # Display basic information about the datasets
+    st.subheader("Data Overview")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.metric("Assets Data Timespan", 
+                 f"{assets_df['End of Period'].min().strftime('%b %Y')} - {assets_df['End of Period'].max().strftime('%b %Y')}")
+        st.metric("Number of Asset Records", f"{len(assets_df)}")
+    
+    with col2:
+        st.metric("Liabilities Data Timespan", 
+                 f"{liabilities_df['End of Period'].min().strftime('%b %Y')} - {liabilities_df['End of Period'].max().strftime('%b %Y')}")
+        st.metric("Number of Liability Records", f"{len(liabilities_df)}")
+    
+    # Sample data preview
+    with st.expander("Preview Assets Data"):
+        st.dataframe(assets_df.head())
+    
+    with st.expander("Preview Liabilities Data"):
+        st.dataframe(liabilities_df.head())
+    
+    # Quick summary visualization
+    st.subheader("Quick Summary")
+    st.markdown("Explore key financial indicators over time using the visualizations below.")
+    
+    # Date range selector for summary
+    min_date = min(assets_df['End of Period'].min(), liabilities_df['End of Period'].min())
+    max_date = max(assets_df['End of Period'].max(), liabilities_df['End of Period'].max())
+    
+    summary_start_date, summary_end_date = st.select_slider(
+        "Select Date Range for Summary",
+        options=sorted(set(assets_df['End of Period'].tolist() + liabilities_df['End of Period'].tolist())),
+        value=(min_date, max_date)
     )
     
-    if selected_deposit_types:
-        # Create deposit composition over time
-        fig = px.area(
-            filtered_df,
-            x='End of Period',
-            y=selected_deposit_types,
-            title="Deposit Composition Over Time",
-            labels={'End of Period': 'Date', 'value': 'Amount'},
-            template="plotly_white"
-        )
-        st.plotly_chart(fig, use_container_width=True)
-        
-        # Show the percentage composition for the most recent date
-        latest_date = filtered_df['End of Period'].max()
-        latest_data = filtered_df[filtered_df['End of Period'] == latest_date][selected_deposit_types]
-        
-        if not latest_data.empty:
-            # Calculate percentages
-            latest_data_pct = latest_data.div(latest_data.sum(axis=1), axis=0) * 100
-            
-            # Create pie chart
-            fig = px.pie(
-                names=selected_deposit_types,
-                values=latest_data_pct.iloc[0],
-                title=f"Deposit Composition as of {latest_date.strftime('%b %Y')}",
-                template="plotly_white"
-            )
+    # Filter data based on selected date range
+    filtered_assets = assets_df[(assets_df['End of Period'] >= summary_start_date) & 
+                              (assets_df['End of Period'] <= summary_end_date)]
+    filtered_liabilities = liabilities_df[(liabilities_df['End of Period'] >= summary_start_date) & 
+                                       (liabilities_df['End of Period'] <= summary_end_date)]
+    
+    # Display summary charts
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        # Total Assets Over Time
+        if 'Total Assets' in filtered_assets.columns:
+            fig = px.line(filtered_assets, x='End of Period', y='Total Assets', 
+                         title='Total Assets Over Time',
+                         labels={'End of Period': 'Date', 'Total Assets': 'Value'},
+                         template='plotly_white')
             st.plotly_chart(fig, use_container_width=True)
-    else:
-        st.info("Please select at least one deposit type for composition analysis.")
-
-# Growth rate analysis
-st.subheader("Growth Rate Analysis")
-
-# Get available periods for growth rate calculation
-growth_periods = [3, 6, 12, 24]
-selected_growth_period = st.selectbox(
-    "Select Period for Growth Rate Calculation",
-    growth_periods,
-    index=2  # Default to 12-period (annual) growth
-)
-
-if selected_metrics:
-    # Calculate growth rates
-    growth_df = dp.get_growth_rates(filtered_df, selected_metrics, selected_growth_period)
+        else:
+            # Create sum of key asset columns as proxy for total assets
+            key_asset_columns = [col for col in filtered_assets.columns if 'Cash' in col or 'Investments' in col or 'Loans' in col]
+            if key_asset_columns:
+                filtered_assets['Assets Sum'] = filtered_assets[key_asset_columns].sum(axis=1)
+                fig = px.line(filtered_assets, x='End of Period', y='Assets Sum', 
+                             title='Sum of Key Assets Over Time',
+                             labels={'End of Period': 'Date', 'Assets Sum': 'Value'},
+                             template='plotly_white')
+                st.plotly_chart(fig, use_container_width=True)
+            else:
+                st.info("No asset summary columns found for visualization")
+                
+    with col2:
+        # Total Liabilities Over Time
+        if 'Total All Deposits_Total' in filtered_liabilities.columns:
+            fig = px.line(filtered_liabilities, x='End of Period', y='Total All Deposits_Total', 
+                         title='Total Deposits Over Time',
+                         labels={'End of Period': 'Date', 'Total All Deposits_Total': 'Value'},
+                         template='plotly_white')
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            # Create sum of key liability columns
+            key_liability_columns = [col for col in filtered_liabilities.columns if 'Deposits' in col or 'Borrowings' in col]
+            if key_liability_columns:
+                filtered_liabilities['Liabilities Sum'] = filtered_liabilities[key_liability_columns].sum(axis=1)
+                fig = px.line(filtered_liabilities, x='End of Period', y='Liabilities Sum', 
+                             title='Sum of Key Liabilities Over Time',
+                             labels={'End of Period': 'Date', 'Liabilities Sum': 'Value'},
+                             template='plotly_white')
+                st.plotly_chart(fig, use_container_width=True)
+            else:
+                st.info("No liability summary columns found for visualization")
     
-    # Get growth rate columns
-    growth_cols = [f"{metric}_Growth" for metric in selected_metrics if f"{metric}_Growth" in growth_df.columns]
+    # Navigation guide
+    st.subheader("Navigation Guide")
+    st.markdown("""
+    Use the sidebar to navigate to different analysis pages:
     
-    if growth_cols:
-        # Plot growth rates
-        fig = px.line(
-            growth_df,
-            x='End of Period',
-            y=growth_cols,
-            title=f"{selected_growth_period}-Period Growth Rates",
-            labels={'End of Period': 'Date', 'value': 'Growth Rate (%)'},
-            template="plotly_white"
-        )
-        st.plotly_chart(fig, use_container_width=True)
-        
-        # Display average growth rates
-        avg_growth = growth_df[growth_cols].mean().reset_index()
-        avg_growth.columns = ['Metric', 'Average Growth Rate (%)']
-        
-        # Clean up metric names
-        avg_growth['Metric'] = avg_growth['Metric'].str.replace('_Growth', '')
-        
-        st.subheader("Average Growth Rates")
-        st.dataframe(avg_growth)
-    else:
-        st.info("Could not calculate growth rates with the selected parameters.")
-else:
-    st.warning("Please select at least one metric for growth rate analysis.")
-
-# Statistical summary
-st.subheader("Statistical Summary")
-
-if selected_metrics:
-    # Calculate summary statistics
-    stats_df = dp.get_summary_statistics(filtered_df, selected_metrics)
+    - **Assets Analysis**: Detailed exploration of financial assets over time
+    - **Liabilities Analysis**: Comprehensive analysis of financial liabilities
+    - **Comparative Analysis**: Compare assets and liabilities trends
+    - **Financial Ratios**: Key financial ratios and indicators
+    - **About**: Information about this dashboard and data sources
+    """)
     
-    if not stats_df.empty:
-        st.dataframe(stats_df)
-    else:
-        st.info("Could not calculate statistics for the selected metrics.")
-else:
-    st.warning("Please select at least one metric for statistical summary.")
-
-# Download the filtered data
-st.subheader("Download Filtered Data")
-
-@st.cache_data
-def convert_df_to_csv(df):
-    return df.to_csv().encode('utf-8')
-
-csv = convert_df_to_csv(filtered_df[['End of Period'] + selected_metrics] if selected_metrics else filtered_df)
-
-st.download_button(
-    label="Download data as CSV",
-    data=csv,
-    file_name='sri_lanka_liabilities_data.csv',
-    mime='text/csv',
-)
+except Exception as e:
+    st.error(f"Error loading or processing data: {str(e)}")
+    st.info("Please make sure the CSV files are correctly placed in the 'attached_assets' folder.")
