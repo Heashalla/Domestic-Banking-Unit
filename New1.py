@@ -51,7 +51,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 # 🚀 Page setup
-st.set_page_config(page_title="Bank Assets and Liabilities Dashboard", layout="wide")
+st.set_page_config(page_title="Sri Lanka Banks Dashboard", layout="wide")
 st.title("🏦 Sri Lanka Banks: Assets & Liabilities Dashboard")
 
 # 📥 Load data
