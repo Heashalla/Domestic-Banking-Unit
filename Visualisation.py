@@ -148,6 +148,27 @@ if numeric_cols:
 else:
     st.info("No numeric data available for insights.")
 
+# 🇱🇰 Floating Sri Lanka Flag
+st.markdown(
+    """
+    <style>
+    .floating-flag {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: auto;
+        opacity: 0.9;
+        z-index: 9999;
+    }
+    </style>
+    <a href="https://en.wikipedia.org/wiki/Flag_of_Sri_Lanka" target="_blank">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Flag_of_Sri_Lanka.svg/320px-Flag_of_Sri_Lanka.svg.png" class="floating-flag">
+    </a>
+    """,
+    unsafe_allow_html=True
+)
+
 # Footer
 st.markdown("---")
 st.caption("Developed for Data Science Project Lifecycle Coursework 5DATA004W | University of Westminster")
