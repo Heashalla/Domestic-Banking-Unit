@@ -1703,43 +1703,4 @@ try:
         
         # Interpretation guidelines
         st.subheader("Key Financial Indicators Interpretation")
-        
-        st.markdown("""
-        ### Important Financial Ratios
-        
-        1. **Assets to Liabilities Ratio**
-           - **Interpretation**: Measures the relationship between a bank's assets and liabilities.
-           - **Significance**: 
-             - Ratio > 1: Assets exceed liabilities, indicating positive net worth.
-             - Ratio = 1: Assets equal liabilities, indicating zero net worth.
-             - Ratio < 1: Liabilities exceed assets, potentially indicating financial distress.
-        
-        2. **Loan to Deposit Ratio**
-           - **Interpretation**: Measures how much of a bank's deposit funding is being used for loans.
-           - **Significance**:
-             - High Ratio: Bank is lending more relative to deposits, potentially higher returns but also higher risk.
-             - Low Ratio: Bank is more conservative in lending, potentially lower returns but also lower risk.
-             - Optimal range typically varies by country and economic conditions.
-        
-        3. **Cash to Deposit Ratio**
-           - **Interpretation**: Measures a bank's ability to meet immediate withdrawal demands.
-           - **Significance**:
-             - Higher Ratio: Indicates better ability to meet immediate withdrawal demands.
-             - Lower Ratio: May indicate higher utilization of deposits for lending.
-        
-        4. **Capital to Asset Ratio**
-           - **Interpretation**: Measures the proportion of a bank's assets that are funded by equity.
-           - **Significance**:
-             - Higher Ratio: Indicates stronger capital position and ability to absorb losses.
-             - Lower Ratio: May indicate higher leverage and potentially higher risk.
-        
-        ### Growth Rate Analysis
-        
-        Growth rates provide insights into the expansion or contraction of various financial metrics over time. Key considerations:
-        
-        - **Positive Growth**: Indicates expansion in the metric being analyzed.
-        - **Negative Growth**: Indicates contraction in the metric being analyzed.
-        - **Stable Growth**: Generally indicates a healthy financial system.
-        - **Volatile Growth**: May indicate underlying economic instability or specific sectoral issues.
-        - **Comparative Growth**: Comparing growth rates between assets and liabilities can reveal
-                    """)
+                
