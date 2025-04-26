@@ -8,6 +8,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import calendar
 
+st.set_page_config(page_title="Sri Lanka Banks Dashboard", layout="wide")
+
 # 🇱🇰 Set Sri Lanka Flag Colors as Background
 def sri_lanka_flag_background():
     st.markdown(
@@ -40,7 +42,6 @@ def sri_lanka_flag_background():
 sri_lanka_flag_background()
 
 # 🚀 Page setup
-st.set_page_config(page_title="Sri Lanka Banks Dashboard", layout="wide")
 st.title("🏦 🇱🇰 Sri Lanka Banks: Domestic Banking Insights")
 st.markdown("_Tracking assets, loans, and financial strength from 1995 to 2025._")
 
