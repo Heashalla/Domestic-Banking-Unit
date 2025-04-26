@@ -13,7 +13,7 @@ st.set_page_config(page_title="Sri Lanka Financial Dashboard", layout="wide")
 assets = pd.read_csv("assets_data_cleaned.csv")
 liabilities = pd.read_csv("liabilties_data_cleaned.csv")
 
-# Preprocessing: Assume both datasets have a 'Year' column to merge
+# Preprocessing: Assume both datasets have a 'End of Period' column to merge
 assets['Type'] = 'Asset'
 liabilities['Type'] = 'Liability'
 
@@ -22,14 +22,14 @@ combined = pd.concat([assets, liabilities], ignore_index=True)
 
 # Sidebar filters
 st.sidebar.header("Filter Data")
-selected_year = st.sidebar.selectbox("Select Year", combined['Year'].unique())
+selected_ End of Period = st.sidebar.selectbox("Select  End of Period", combined[' End of Period'].unique())
 
 # Filtered data
-filtered_data = combined[combined['Year'] == selected_year]
+filtered_data = combined[combined[' End of Period'] == selected_ End of Period]
 
 # KPIs
-total_assets = assets[assets['Year'] == selected_year]['Value'].sum()
-total_liabilities = liabilities[liabilities['Year'] == selected_year]['Value'].sum()
+total_assets = assets[assets[' End of Period'] == selected_ End of Period]['Value'].sum()
+total_liabilities = liabilities[liabilities[' End of Period'] == selected_ End of Period]['Value'].sum()
 net_worth = total_assets - total_liabilities
 
 # Display KPIs
@@ -45,12 +45,12 @@ try:
     ratio = total_assets / total_liabilities
 except ZeroDivisionError:
     ratio = 0
-st.subheader(f"Asset to Liability Ratio in {selected_year}: {ratio:.2f}")
+st.subheader(f"Asset to Liability Ratio in {selected_ End of Period}: {ratio:.2f}")
 
-# Trend Analysis (across years)
+# Trend Analysis (across  End of Periods)
 st.subheader("Trend Over Time")
-trend_data = combined.groupby(['Year', 'Type'])['Value'].sum().reset_index()
-fig_trend = px.line(trend_data, x='Year', y='Value', color='Type', markers=True)
+trend_data = combined.groupby([' End of Period', 'Type'])['Value'].sum().reset_index()
+fig_trend = px.line(trend_data, x=' End of Period', y='Value', color='Type', markers=True)
 st.plotly_chart(fig_trend, use_container_width=True)
 
 # Breakdown by Category (if available)
@@ -58,8 +58,8 @@ if 'Category' in combined.columns:
     st.subheader("Category-wise Breakdown")
     col4, col5 = st.columns(2)
 
-    asset_cat = assets[assets['Year'] == selected_year]
-    liability_cat = liabilities[liabilities['Year'] == selected_year]
+    asset_cat = assets[assets[' End of Period'] == selected_ End of Period]
+    liability_cat = liabilities[liabilities[' End of Period'] == selected_ End of Period]
 
     fig_asset_cat = px.pie(asset_cat, names='Category', values='Value', title='Assets by Category')
     fig_liability_cat = px.pie(liability_cat, names='Category', values='Value', title='Liabilities by Category')
