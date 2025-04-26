@@ -6,98 +6,106 @@ import plotly.express as px
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-# Set page config
+# 🚀 Page setup
 st.set_page_config(page_title="Bank Assets and Liabilities Dashboard", layout="wide")
+st.title("🏦 Sri Lanka Banks: Assets & Liabilities Dashboard")
 
-# App title
-st.title("🏦 Sri Lanka Banks: Assets and Liabilities Dashboard")
-
-# Load data (no uploads, loading directly)
+# 📥 Load data
 assets_df = pd.read_csv("assets_data_cleaned.csv")
 liabilities_df = pd.read_csv("liabilties_data_cleaned.csv")
 
-# Sidebar options
-st.sidebar.header("Options")
-view_option = st.sidebar.radio("Select Dataset", ["Assets", "Liabilities"])
+# 🧠 Identify shared filter column
+filter_col = "End of Period"  # Adjust this if your actual column name is slightly different
 
-# Dataset selection
-if view_option == "Assets":
+# 🔘 Sidebar
+st.sidebar.header("Controls")
+dataset_choice = st.sidebar.radio("Select Dataset", ["Assets", "Liabilities"])
+
+# 🎯 Select dataset
+if dataset_choice == "Assets":
     df = assets_df.copy()
     dataset_title = "Assets"
 else:
     df = liabilities_df.copy()
     dataset_title = "Liabilities"
 
-# KPI Section
-st.subheader(f"🔑 {dataset_title} - Key Performance Indicators")
+# 📆 Filter by End of Period
+if filter_col in df.columns:
+    df[filter_col] = pd.to_datetime(df[filter_col], errors='coerce')
+    df = df.dropna(subset=[filter_col])
+    unique_dates = sorted(df[filter_col].dt.to_period('M').astype(str).unique())
+    selected_date = st.sidebar.selectbox("Filter by End of Period", unique_dates)
+    df = df[df[filter_col].dt.to_period('M').astype(str) == selected_date]
 
+# 📊 KPI Section
+st.subheader(f"🔑 {dataset_title} Key Stats ({selected_date})")
 col1, col2 = st.columns(2)
-
 with col1:
-    total_sum = df.select_dtypes(include=["float64", "int64"]).sum().sum()
-    st.metric(f"Total {dataset_title}", f"{total_sum:,.0f}")
-
+    total_val = df.select_dtypes(include="number").sum().sum()
+    st.metric("Total Value", f"{total_val:,.0f}")
 with col2:
-    avg_value = df.select_dtypes(include=["float64", "int64"]).mean().mean()
-    st.metric(f"Average {dataset_title} Value", f"{avg_value:,.2f}")
+    avg_val = df.select_dtypes(include="number").mean().mean()
+    st.metric("Average per Metric", f"{avg_val:,.2f}")
 
-# Tabs for content
-tab1, tab2, tab3 = st.tabs(["📄 Data Table", "📈 Charts", "🔎 Insights"])
+# 📈 Charts Section
+st.subheader(f"📊 Visual Analysis of {dataset_title}")
 
-with tab1:
-    st.subheader(f"{dataset_title} Data Table")
-    st.dataframe(df)
+numeric_cols = df.select_dtypes(include="number").columns.tolist()
+if numeric_cols:
+    selected_col = st.selectbox(f"Choose a {dataset_title} metric to visualize:", numeric_cols)
 
-with tab2:
-    st.subheader(f"{dataset_title} Charts")
+    chart1, chart2 = st.columns(2)
 
-    numeric_cols = df.select_dtypes(include=["float64", "int64"]).columns.tolist()
-    if numeric_cols:
-        selected_col = st.selectbox("Select a numeric column to visualize", numeric_cols)
+    with chart1:
+        st.plotly_chart(px.line(df, x=filter_col, y=selected_col,
+                                title=f"{selected_col} - Trend Line",
+                                template="plotly_dark",
+                                markers=True))
 
-        # Line Chart
-        st.plotly_chart(px.line(df, y=selected_col, title=f"{dataset_title} - {selected_col} Over Time"))
+    with chart2:
+        st.plotly_chart(px.area(df, x=filter_col, y=selected_col,
+                                title=f"{selected_col} - Area Chart",
+                                template="plotly"))
 
-        # Histogram
-        st.plotly_chart(px.histogram(df, x=selected_col, nbins=30, title=f"{dataset_title} - {selected_col} Distribution"))
+    if df[selected_col].nunique() > 1:
+        st.plotly_chart(px.box(df, y=selected_col,
+                               title=f"{selected_col} - Value Spread",
+                               template="ggplot2"))
+else:
+    st.warning("No numeric columns found for visualization.")
 
-        # Box Plot
-        st.plotly_chart(px.box(df, y=selected_col, title=f"{dataset_title} - {selected_col} Spread"))
-    else:
-        st.warning("No numeric columns found for visualization.")
+# 📊 Insights Section
+st.subheader(f"🔍 Explore & Compare Insights")
 
-with tab3:
-    st.subheader(f"{dataset_title} Insights")
+if numeric_cols:
+    insight_col = st.selectbox("Choose a metric for deeper insights", numeric_cols, key="insight_col")
 
-    if df.select_dtypes(include=["float64", "int64"]).shape[1] > 0:
-        # Show Top 5 and Bottom 5 values
-        st.write("### 🔝 Top 5 Records (by Total Sum)")
-        df["Total"] = df.select_dtypes(include=["float64", "int64"]).sum(axis=1)
-        top5 = df.nlargest(5, "Total")
-        st.dataframe(top5)
+    # Top/Bottom 5
+    df["Total"] = df[numeric_cols].sum(axis=1)
+    st.write("### 🔝 Top 5 Records (by Total across columns)")
+    st.dataframe(df.nlargest(5, "Total")[["Total", insight_col]])
 
-        st.write("### 🔻 Bottom 5 Records (by Total Sum)")
-        bottom5 = df.nsmallest(5, "Total")
-        st.dataframe(bottom5)
+    st.write("### 🔻 Bottom 5 Records (by Total across columns)")
+    st.dataframe(df.nsmallest(5, "Total")[["Total", insight_col]])
 
-        # Correlation Heatmap
-        st.write("### 📈 Correlation Heatmap")
-        corr = df.select_dtypes(include=["float64", "int64"]).corr()
-        fig, ax = plt.subplots(figsize=(10, 6))
-        sns.heatmap(corr, annot=True, cmap="Blues", ax=ax)
-        st.pyplot(fig)
+    # Correlation Heatmap
+    st.write("### 🔵 Correlation Map")
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.heatmap(df[numeric_cols].corr(), annot=True, cmap="coolwarm", ax=ax)
+    st.pyplot(fig)
 
-        # Trend overview
-        st.write("### 📈 Overall Trend Overview")
-        df["Index"] = df.index
-        trend_col = df.select_dtypes(include=["float64", "int64"]).columns[0]  # First numeric column
-        trend_fig = px.line(df, x="Index", y=trend_col, title=f"{dataset_title} - {trend_col} Trend")
-        st.plotly_chart(trend_fig)
+    # Optional Pie Chart if values add up to meaningful whole
+    if df[insight_col].sum() > 0:
+        st.write("### 🥧 Pie Chart Representation")
+        pie_df = df[[insight_col]].copy()
+        pie_df["Label"] = pie_df.index.astype(str)
+        st.plotly_chart(px.pie(pie_df, names="Label", values=insight_col, title=f"{insight_col} Distribution"))
 
-        # Clean up temp columns
-        df.drop(columns=["Total", "Index"], inplace=True)
-    else:
-        st.info("No numeric data available for insights.")
+    df.drop(columns=["Total"], inplace=True)
+
+else:
+    st.info("No numeric data available for insights.")
 
 # Footer
+st.markdown("---")
 st.caption("Developed for Data Science Project Lifecycle Coursework 5DATA004W | University of Westminster")
