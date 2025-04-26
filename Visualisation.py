@@ -28,8 +28,8 @@ selected_End_of_Period = st.sidebar.selectbox("Select End of Period", combined['
 filtered_data = combined[combined['End of Period'] == selected_End_of_Period]
 
 # KPIs
-total_assets = assets[assets[' End of Period'] == selected_End_of_Period]['Value'].sum()
-total_liabilities = liabilities[liabilities[' End of Period'] == selected_End_of_Period]['Value'].sum()
+total_assets = assets[assets['End of Period'] == selected_End_of_Period]['Value'].sum()
+total_liabilities = liabilities[liabilities['End of Period'] == selected_End_of_Period]['Value'].sum()
 net_worth = total_assets - total_liabilities
 
 # Display KPIs
@@ -49,8 +49,8 @@ st.subheader(f"Asset to Liability Ratio in {selected_End_of_Period}: {ratio:.2f}
 
 # Trend Analysis (across  End of Periods)
 st.subheader("Trend Over Time")
-trend_data = combined.groupby([' End of Period', 'Type'])['Value'].sum().reset_index()
-fig_trend = px.line(trend_data, x=' End of Period', y='Value', color='Type', markers=True)
+trend_data = combined.groupby(['End of Period', 'Type'])['Value'].sum().reset_index()
+fig_trend = px.line(trend_data, x='End of Period', y='Value', color='Type', markers=True)
 st.plotly_chart(fig_trend, use_container_width=True)
 
 # Breakdown by Category (if available)
@@ -58,8 +58,8 @@ if 'Category' in combined.columns:
     st.subheader("Category-wise Breakdown")
     col4, col5 = st.columns(2)
 
-    asset_cat = assets[assets[' End of Period'] == selected_End_of_Period]
-    liability_cat = liabilities[liabilities[' End of Period'] == selected_End_of_Period]
+    asset_cat = assets[assets['End of Period'] == selected_End_of_Period]
+    liability_cat = liabilities[liabilities['End of Period'] == selected_End_of_Period]
 
     fig_asset_cat = px.pie(asset_cat, names='Category', values='Value', title='Assets by Category')
     fig_liability_cat = px.pie(liability_cat, names='Category', values='Value', title='Liabilities by Category')
