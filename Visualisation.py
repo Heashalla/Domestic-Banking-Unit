@@ -9,7 +9,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Set Streamlit page configuration
+# 🚨 set_page_config MUST come FIRST before any other Streamlit command
 st.set_page_config(page_title="Bank Assets and Liabilities Dashboard", layout="wide")
 
 st.title("📊 Bank Assets and Liabilities Visualization")
