@@ -14,8 +14,8 @@ st.title("🏦 Sri Lanka Banks: Assets & Liabilities Dashboard")
 assets_df = pd.read_csv("assets_data_cleaned.csv")
 liabilities_df = pd.read_csv("liabilties_data_cleaned.csv")
 
-# 🧠 Identify shared filter column
-filter_col = "End of Period"  # Adjust this if your actual column name is slightly different
+# 📦 Filter column (date filter)
+filter_col = "End of Period"  # Make sure it matches exactly!
 
 # 🔘 Sidebar
 st.sidebar.header("Controls")
@@ -29,16 +29,25 @@ else:
     df = liabilities_df.copy()
     dataset_title = "Liabilities"
 
-# 📆 Filter by End of Period
+# 📅 Filter by Year and Month separately
 if filter_col in df.columns:
     df[filter_col] = pd.to_datetime(df[filter_col], errors='coerce')
     df = df.dropna(subset=[filter_col])
-    unique_dates = sorted(df[filter_col].dt.to_period('M').astype(str).unique())
-    selected_date = st.sidebar.selectbox("Filter by End of Period", unique_dates)
-    df = df[df[filter_col].dt.to_period('M').astype(str) == selected_date]
+
+    # Extract Year and Month
+    df['Year'] = df[filter_col].dt.year
+    df['Month'] = df[filter_col].dt.month_name()
+
+    # Sidebar filter options
+    selected_year = st.sidebar.selectbox("Select Year", sorted(df['Year'].unique(), reverse=True))
+    available_months = df[df['Year'] == selected_year]['Month'].unique()
+    selected_month = st.sidebar.selectbox("Select Month", sorted(available_months))
+
+    # Apply filtering
+    df = df[(df['Year'] == selected_year) & (df['Month'] == selected_month)]
 
 # 📊 KPI Section
-st.subheader(f"🔑 {dataset_title} Key Stats ({selected_date})")
+st.subheader(f"🔑 {dataset_title} Key Stats ({selected_month} {selected_year})")
 col1, col2 = st.columns(2)
 with col1:
     total_val = df.select_dtypes(include="number").sum().sum()
@@ -54,58 +63,42 @@ numeric_cols = df.select_dtypes(include="number").columns.tolist()
 if numeric_cols:
     selected_col = st.selectbox(f"Choose a {dataset_title} metric to visualize:", numeric_cols)
 
-    chart1, chart2 = st.columns(2)
+    # Line Chart
+    st.plotly_chart(px.line(df, x=filter_col, y=selected_col,
+                            title=f"{selected_col} Over Time",
+                            template="plotly_dark",
+                            markers=True))
 
-    with chart1:
-        st.plotly_chart(px.line(df, x=filter_col, y=selected_col,
-                                title=f"{selected_col} - Trend Line",
-                                template="plotly_dark",
-                                markers=True))
-
-    with chart2:
-        st.plotly_chart(px.area(df, x=filter_col, y=selected_col,
-                                title=f"{selected_col} - Area Chart",
-                                template="plotly"))
-
-    if df[selected_col].nunique() > 1:
-        st.plotly_chart(px.box(df, y=selected_col,
-                               title=f"{selected_col} - Value Spread",
-                               template="ggplot2"))
+    # Box Plot
+    st.plotly_chart(px.box(df, y=selected_col,
+                           title=f"{selected_col} Value Spread",
+                           template="ggplot2"))
 else:
     st.warning("No numeric columns found for visualization.")
 
 # 📊 Insights Section
-st.subheader(f"🔍 Explore & Compare Insights")
+st.subheader(f"🔍 Correlation & Distribution Insights")
 
 if numeric_cols:
     insight_col = st.selectbox("Choose a metric for deeper insights", numeric_cols, key="insight_col")
 
-    # Top/Bottom 5
-    df["Total"] = df[numeric_cols].sum(axis=1)
-    st.write("### 🔝 Top 5 Records (by Total across columns)")
-    st.dataframe(df.nlargest(5, "Total")[["Total", insight_col]])
-
-    st.write("### 🔻 Bottom 5 Records (by Total across columns)")
-    st.dataframe(df.nsmallest(5, "Total")[["Total", insight_col]])
-
     # Correlation Heatmap
-    st.write("### 🔵 Correlation Map")
+    st.write("### 🔵 Correlation Heatmap")
     fig, ax = plt.subplots(figsize=(10, 6))
     sns.heatmap(df[numeric_cols].corr(), annot=True, cmap="coolwarm", ax=ax)
     st.pyplot(fig)
 
-    # Optional Pie Chart if values add up to meaningful whole
-    if df[insight_col].sum() > 0:
-        st.write("### 🥧 Pie Chart Representation")
-        pie_df = df[[insight_col]].copy()
-        pie_df["Label"] = pie_df.index.astype(str)
-        st.plotly_chart(px.pie(pie_df, names="Label", values=insight_col, title=f"{insight_col} Distribution"))
-
-    df.drop(columns=["Total"], inplace=True)
+    # Optional Pie Chart
+    st.write("### 🥧 Pie Chart (Proportional View)")
+    pie_df = df[[insight_col]].copy()
+    pie_df["Label"] = pie_df.index.astype(str)
+    st.plotly_chart(px.pie(pie_df, names="Label", values=insight_col,
+                           title=f"{insight_col} Distribution",
+                           template="seaborn"))
 
 else:
-    st.info("No numeric data available for insights.")
+    st.info("No numeric columns available to show insights.")
 
-# Footer
+# 📎 Footer
 st.markdown("---")
 st.caption("Developed for Data Science Project Lifecycle Coursework 5DATA004W | University of Westminster")
