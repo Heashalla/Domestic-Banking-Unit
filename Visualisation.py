@@ -32,15 +32,20 @@ def sri_lanka_flag_background():
         [data-testid="stSidebar"] {
             background: linear-gradient(
                 135deg,
-                #fff8dc 0%,
-                #f5deb3 50%,
-                #fff8dc 100%
+                #c49a6c 0%,   /* Softer bronze */
+                #FFD700 50%,  /* Gold */
+                #c49a6c 100%
             );
-            border: 3px solid #FFD700;
+            border: 2px solid #8D1B1B; /* Dark Red Border */
             border-radius: 15px;
-            padding: 20px;
+            padding: 15px;
             margin: 10px;
-            color: black;
+            color: black; /* Sidebar text color */
+            font-weight: bold;
+        }
+
+        [data-testid="stSidebar"] .css-ng1t4o {
+            color: black; /* Force sidebar widgets text to black */
         }
 
         @keyframes gradientAnimation {
@@ -52,6 +57,7 @@ def sri_lanka_flag_background():
         """,
         unsafe_allow_html=True
     )
+
 
 # 🎨 Apply Background
 sri_lanka_flag_background()
