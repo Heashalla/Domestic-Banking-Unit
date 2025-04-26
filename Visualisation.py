@@ -162,8 +162,8 @@ st.markdown(
         z-index: 9999;
     }
     </style>
-    <a href="https://en.wikipedia.org/wiki/Flag_of_Sri_Lanka" target="_blank">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Flag_of_Sri_Lanka.svg/320px-Flag_of_Sri_Lanka.svg.png" class="floating-flag">
+    <a href="https://www.cbsl.gov.lk/en/statistics/statistical-tables/monetary-sector" target="_blank">
+        <img src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FCentral_Bank_of_Sri_Lanka&psig=AOvVaw22MWwfozXuRNaVefcnmsx1&ust=1745760415718000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCKDtir7m9YwDFQAAAAAdAAAAABAE" class="floating-flag">
     </a>
     """,
     unsafe_allow_html=True
