@@ -74,6 +74,13 @@ filter_col = "End of Period"
 if filter_col in df.columns:
     df = df.dropna(subset=[filter_col])
     df['Year'] = df[filter_col].dt.year
+    df['Month'] = df[filter_col].dt.month_name()
+
+    selected_year = st.sidebar.selectbox("Select Year", sorted(df['Year'].unique(), reverse=True))
+    available_months = df[df['Year'] == selected_year]['Month'].unique()
+    selected_month = st.sidebar.selectbox("Select Month", sorted(available_months))
+
+    df = df[(df['Year'] == selected_year) & (df['Month'] == selected_month)]
 
 # 📊 Smart KPI Section
 st.subheader(f"🔑 {dataset_title} Overview ({selected_month} {selected_year})")
