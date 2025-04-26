@@ -1,9 +1,5 @@
-# streamlit_app.py
-
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 import plotly.express as px
 
 # Set Streamlit page config
@@ -17,11 +13,18 @@ liabilities = pd.read_csv("liabilties_data_cleaned.csv")
 assets.columns = assets.columns.str.strip()
 liabilities.columns = liabilities.columns.str.strip()
 
-# Rename 'End of Period' to 'Year'
-assets.rename(columns={'End of Period': 'Year'}, inplace=True)
-liabilities.rename(columns={'End of Period': 'Year'}, inplace=True)
+# Rename necessary columns
+if 'End of Period' in assets.columns:
+    assets.rename(columns={'End of Period': 'Year'}, inplace=True)
+if 'End of Period' in liabilities.columns:
+    liabilities.rename(columns={'End of Period': 'Year'}, inplace=True)
 
-# Preprocessing
+# Check if 'Value' column exists
+if 'Value' not in assets.columns or 'Value' not in liabilities.columns:
+    st.error("'Value' column missing in one of the datasets! Please check your CSV files.")
+    st.stop()
+
+# Add Type column
 assets['Type'] = 'Asset'
 liabilities['Type'] = 'Liability'
 
@@ -30,7 +33,12 @@ combined = pd.concat([assets, liabilities], ignore_index=True)
 
 # Sidebar filters
 st.sidebar.header("Filter Data")
-selected_year = st.sidebar.selectbox("Select Year", combined['Year'].unique())
+
+if 'Year' in combined.columns:
+    selected_year = st.sidebar.selectbox("Select Year", sorted(combined['Year'].dropna().unique()))
+else:
+    st.error("'Year' column missing after cleaning!")
+    st.stop()
 
 # Filtered data
 filtered_data = combined[combined['Year'] == selected_year]
@@ -44,24 +52,25 @@ net_worth = total_assets - total_liabilities
 st.title("Sri Lanka Financial Dashboard")
 col1, col2, col3 = st.columns(3)
 
-col1.metric("Total Assets", f"LKR {total_assets:,.2f}")
-col2.metric("Total Liabilities", f"LKR {total_liabilities:,.2f}")
-col3.metric("Net Worth", f"LKR {net_worth:,.2f}")
+col1.metric("Total Assets", f\"LKR {total_assets:,.2f}\")
+col2.metric("Total Liabilities", f\"LKR {total_liabilities:,.2f}\")
+col3.metric("Net Worth", f\"LKR {net_worth:,.2f}\")
 
 # Advanced Analysis: Asset to Liability Ratio
 try:
     ratio = total_assets / total_liabilities
 except ZeroDivisionError:
     ratio = 0
+
 st.subheader(f"Asset to Liability Ratio in {selected_year}: {ratio:.2f}")
 
-# Trend Analysis (across years)
+# Trend Analysis
 st.subheader("Trend Over Time")
 trend_data = combined.groupby(['Year', 'Type'])['Value'].sum().reset_index()
 fig_trend = px.line(trend_data, x='Year', y='Value', color='Type', markers=True)
 st.plotly_chart(fig_trend, use_container_width=True)
 
-# Breakdown by Category (if available)
+# Breakdown by Category (Optional)
 if 'Category' in combined.columns:
     st.subheader("Category-wise Breakdown")
     col4, col5 = st.columns(2)
@@ -75,7 +84,7 @@ if 'Category' in combined.columns:
     col4.plotly_chart(fig_asset_cat, use_container_width=True)
     col5.plotly_chart(fig_liability_cat, use_container_width=True)
 
-# Raw Data View
+# Raw Data
 with st.expander("See Raw Data"):
     st.dataframe(filtered_data)
 
