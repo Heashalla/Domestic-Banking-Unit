@@ -23,8 +23,8 @@ Explore various financial indicators, compare trends, and discover insights thro
 
 # Load and process data
 try:
-    assets_df = pd.read_csv('attached_assets/assets_data_cleaned.csv')
-    liabilities_df = pd.read_csv('attached_assets/liabilties_data_cleaned.csv')
+    assets_df = pd.read_csv('assets_data_cleaned.csv')
+    liabilities_df = pd.read_csv('liabilties_data_cleaned.csv')
     
     # Convert 'End of Period' to datetime
     assets_df['End of Period'] = pd.to_datetime(assets_df['End of Period'])
