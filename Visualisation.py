@@ -29,30 +29,23 @@ def sri_lanka_flag_background():
             animation: gradientAnimation 15s ease infinite;
         }
 
-        /* Sidebar container */
-        [data-testid="stSidebar"] > div:first-child {
+        [data-testid="stSidebar"] {
             background: linear-gradient(
                 135deg,
-                #c49a6c 0%,
-                #FFD700 50%,
+                #c49a6c 0%,   /* Softer bronze */
+                #FFD700 50%,  /* Gold */
                 #c49a6c 100%
             );
-            border: 3px solid #8D1B1B; /* Dark red border */
+            border: 2px solid #8D1B1B; /* Dark Red Border */
             border-radius: 15px;
-            margin: 20px;
-            padding: 20px;
-            color: black;
+            padding: 15px;
+            margin: 10px;
+            color: black; /* Sidebar text color */
             font-weight: bold;
-            height: fit-content;
-            min-height: 300px;
-            max-height: 90vh;
-            box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
         }
 
-        /* Force text color inside sidebar */
-        [data-testid="stSidebar"] .css-ng1t4o, [data-testid="stSidebar"] .css-1d391kg {
-            color: black;
-            font-weight: bold;
+        [data-testid="stSidebar"] .css-ng1t4o {
+            color: black; /* Force sidebar widgets text to black */
         }
 
         @keyframes gradientAnimation {
@@ -64,7 +57,6 @@ def sri_lanka_flag_background():
         """,
         unsafe_allow_html=True
     )
-
 
 
 # 🎨 Apply Background
