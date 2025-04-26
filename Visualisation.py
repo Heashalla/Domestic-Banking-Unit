@@ -81,81 +81,75 @@ if filter_col in df.columns:
 
     df = df[(df['Year'] == selected_year) & (df['Month'] == selected_month)]
 
-# 📊 Smart KPI Section
-st.subheader(f"🔑 {dataset_title} Overview ({selected_month} {selected_year})")
-
-# Metrics calculations
-total_assets = df.select_dtypes(include="number").sum().sum()
-average_asset = df.select_dtypes(include="number").mean().mean()
-
-# Growth Calculation
-previous_month_df = df.copy()
-previous_month_df['Month'] = pd.Categorical(previous_month_df['Month'],
-    categories=list(calendar.month_name)[1:], ordered=True)
-
-previous_months = previous_month_df.sort_values('Month')['Month'].unique()
-current_index = list(previous_months).tolist().index(selected_month)
-if current_index > 0:
-    previous_month_name = previous_months[current_index-1]
-    previous_data = df[df['Month'] == previous_month_name]
-    if not previous_data.empty:
-        previous_total = previous_data.select_dtypes(include="number").sum().sum()
-        growth_rate = ((total_assets - previous_total) / previous_total) * 100
-    else:
-        growth_rate = 0
-else:
-    growth_rate = 0
-
-# Biggest Contributor
-biggest_contributor = df.select_dtypes(include="number").sum().idxmax()
-
-# 📊 Display KPIs
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("Total Value", f"Rs. {total_assets:,.0f}")
-col2.metric("Average Value", f"Rs. {average_asset:,.0f}")
-col3.metric("Monthly Growth Rate", f"{growth_rate:.2f}%")
-col4.metric("Top Category", biggest_contributor)
+# 📊 KPI Section
+st.subheader(f"🔑 {dataset_title} Key Stats ({selected_date})")
+col1, col2 = st.columns(2)
+with col1:
+    total_val = df.select_dtypes(include="number").sum().sum()
+    st.metric("Total Value", f"{total_val:,.0f}")
+with col2:
+    avg_val = df.select_dtypes(include="number").mean().mean()
+    st.metric("Average per Metric", f"{avg_val:,.2f}")
 
 # 📈 Charts Section
-st.subheader(f"📈 {dataset_title} Trend Visualizations")
+st.subheader(f"📊 Visual Analysis of {dataset_title}")
 
 numeric_cols = df.select_dtypes(include="number").columns.tolist()
 if numeric_cols:
-    selected_col = st.selectbox(f"Select a {dataset_title} metric to visualize:", numeric_cols)
+    selected_col = st.selectbox(f"Choose a {dataset_title} metric to visualize:", numeric_cols)
 
-    fig_line = px.line(df, x=filter_col, y=selected_col,
-                       title=f"{selected_col} Trend Over Time",
-                       template="plotly_dark", markers=True)
-    st.plotly_chart(fig_line, use_container_width=True)
+    chart1, chart2 = st.columns(2)
 
-    fig_area = px.area(df, x=filter_col, y=selected_col,
-                       title=f"{selected_col} Area Representation",
-                       template="simple_white")
-    st.plotly_chart(fig_area, use_container_width=True)
+    with chart1:
+        st.plotly_chart(px.line(df, x=filter_col, y=selected_col,
+                                title=f"{selected_col} - Trend Line",
+                                template="plotly_dark",
+                                markers=True))
 
+    with chart2:
+        st.plotly_chart(px.area(df, x=filter_col, y=selected_col,
+                                title=f"{selected_col} - Area Chart",
+                                template="plotly"))
+
+    if df[selected_col].nunique() > 1:
+        st.plotly_chart(px.box(df, y=selected_col,
+                               title=f"{selected_col} - Value Spread",
+                               template="ggplot2"))
 else:
-    st.warning("No numeric columns available to visualize.")
+    st.warning("No numeric columns found for visualization.")
 
-# 🔍 Insights Section
-st.subheader(f"🔎 Correlation & Distribution Insights")
+# 📊 Insights Section
+st.subheader(f"🔍 Explore & Compare Insights")
 
 if numeric_cols:
-    # Correlation heatmap
-    st.write("### 🔵 Correlation Heatmap")
+    insight_col = st.selectbox("Choose a metric for deeper insights", numeric_cols, key="insight_col")
+
+    # Top/Bottom 5
+    df["Total"] = df[numeric_cols].sum(axis=1)
+    st.write("### 🔝 Top 5 Records (by Total across columns)")
+    st.dataframe(df.nlargest(5, "Total")[["Total", insight_col]])
+
+    st.write("### 🔻 Bottom 5 Records (by Total across columns)")
+    st.dataframe(df.nsmallest(5, "Total")[["Total", insight_col]])
+
+    # Correlation Heatmap
+    st.write("### 🔵 Correlation Map")
     fig, ax = plt.subplots(figsize=(10, 6))
     sns.heatmap(df[numeric_cols].corr(), annot=True, cmap="coolwarm", ax=ax)
     st.pyplot(fig)
 
-    # Pie Chart
-    st.write("### 🥧 Pie Chart View")
-    pie_df = df[[selected_col]].copy()
-    pie_df["Label"] = pie_df.index.astype(str)
-    st.plotly_chart(px.pie(pie_df, names="Label", values=selected_col,
-                           title=f"{selected_col} Distribution",
-                           template="seaborn"))
-else:
-    st.info("No numeric columns to display.")
+    # Optional Pie Chart if values add up to meaningful whole
+    if df[insight_col].sum() > 0:
+        st.write("### 🥧 Pie Chart Representation")
+        pie_df = df[[insight_col]].copy()
+        pie_df["Label"] = pie_df.index.astype(str)
+        st.plotly_chart(px.pie(pie_df, names="Label", values=insight_col, title=f"{insight_col} Distribution"))
 
-# 📎 Footer
+    df.drop(columns=["Total"], inplace=True)
+
+else:
+    st.info("No numeric data available for insights.")
+
+# Footer
 st.markdown("---")
-st.caption("Developed by [Your Name] | 5DATA004W Data Science Project Lifecycle | University of Westminster")
+st.caption("Developed for Data Science Project Lifecycle Coursework 5DATA004W | University of Westminster")
