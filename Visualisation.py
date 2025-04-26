@@ -8,10 +8,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import calendar
 
-# 🚀 FIRST: Page setup (must be FIRST Streamlit command!)
-st.set_page_config(page_title="Sri Lanka Banks Dashboard", layout="wide")
-
-# 🇱🇰 THEN: Set Sri Lanka Flag Colors as Background
+# 🇱🇰 Set Sri Lanka Flag Colors as Background
 def sri_lanka_flag_background():
     st.markdown(
         """
@@ -42,7 +39,8 @@ def sri_lanka_flag_background():
 # 🎨 Apply Background
 sri_lanka_flag_background()
 
-# 🏦 Title and Subtitle
+# 🚀 Page setup
+st.set_page_config(page_title="Sri Lanka Banks Dashboard", layout="wide")
 st.title("🏦 🇱🇰 Sri Lanka Banks: Domestic Banking Insights")
 st.markdown("_Tracking assets, loans, and financial strength from 1995 to 2025._")
 
