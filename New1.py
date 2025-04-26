@@ -125,3 +125,22 @@ else:
 # 📎 Footer
 st.markdown("---")
 st.caption("Developed by [Your Name] | 5DATA004W Data Science Project Lifecycle | University of Westminster")
+
+# Dynamically change background color using Streamlit's markdown
+def set_background(color):
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-color: {color};
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+# Set background color based on dataset choice
+if dataset_choice == "Assets":
+    set_background("#E3F2FD")  # Light blue
+else:
+    set_background("#ECEFF1")  # Light grey
