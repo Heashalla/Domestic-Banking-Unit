@@ -102,7 +102,7 @@ def load_data():
 assets_df, liabilities_df = load_data()
 
 # 📦 Sidebar Controls
-st.sidebar.header("🔧 Controls")
+st.sidebar.header("DBU")
 dataset_choice = st.sidebar.radio("Select Dataset", ["Assets", "Liabilities"])
 
 # 🎯 Dataset selection
