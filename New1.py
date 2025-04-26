@@ -173,9 +173,6 @@ else:
 # 🔍 Insights Section
 st.subheader(f"🔎 Correlation Insights ({selected_year})")
 
-# 🔍 Insights Section
-st.subheader(f"🔎 Correlation Insights ({selected_year})")
-
 if numeric_cols:
     corr_matrix = df[numeric_cols].corr()
 
@@ -236,6 +233,7 @@ if numeric_cols:
 
 else:
     st.info("No numeric data available for correlation analysis.")
+
 
 # 📎 Footer
 st.markdown("---")
