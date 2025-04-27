@@ -108,8 +108,30 @@ if logo_url != "YOUR_LOGO_URL_HERE":
         st.sidebar.warning(f"Error loading logo: {e}")
         st.sidebar.markdown("---")
 
-st.sidebar.markdown("<h4 style=''>📊 Data Selection</h4>", unsafe_allow_html=True)
 dataset_choice = st.sidebar.radio("Choose Data View:", ["Assets", "Liabilities"])
+
+# 🎯 Dataset selection
+if dataset_choice == "Assets":
+    df = assets_df.copy()
+    dataset_title = "Assets"
+else:
+    df = liabilities_df.copy()
+    dataset_title = "Liabilities"
+
+filter_col = "End of Period"
+
+# 📆 Sidebar Filter: Select Year Only
+if filter_col in df.columns:
+    df = df.dropna(subset=[filter_col])
+    df['Year'] = df[filter_col].dt.year
+    df['Month'] = df[filter_col].dt.month
+    df['Month Name'] = df[filter_col].dt.month_name()
+
+    selected_year = st.sidebar.selectbox("Choose Year:", sorted(df['Year'].unique(), reverse=True))
+    df = df[df['Year'] == selected_year]
+
+    st.sidebar.markdown("<h4 style=''>📊 Data Selection</h4>", unsafe_allow_html=True)
+
 
 st.sidebar.markdown("<h4 style='margin-top: 1.5rem;'>💾 Export Options</h4>", unsafe_allow_html=True)
 export_format = st.sidebar.radio("Select Format:", ["CSV", "Excel"])
@@ -141,25 +163,6 @@ if st.sidebar.button("📤 Download Selected Data"):
 st.sidebar.markdown("---")
 st.sidebar.markdown("<h4 style=''>🗓️ Filter by Time</h4>", unsafe_allow_html=True)
 
-# 🎯 Dataset selection
-if dataset_choice == "Assets":
-    df = assets_df.copy()
-    dataset_title = "Assets"
-else:
-    df = liabilities_df.copy()
-    dataset_title = "Liabilities"
-
-filter_col = "End of Period"
-
-# 📆 Sidebar Filter: Select Year Only
-if filter_col in df.columns:
-    df = df.dropna(subset=[filter_col])
-    df['Year'] = df[filter_col].dt.year
-    df['Month'] = df[filter_col].dt.month
-    df['Month Name'] = df[filter_col].dt.month_name()
-
-    selected_year = st.sidebar.selectbox("Choose Year:", sorted(df['Year'].unique(), reverse=True))
-    df = df[df['Year'] == selected_year]
 
 # 🔑 KPI Section
 st.subheader(f"🔑 {dataset_title} Overview ({selected_year})")
