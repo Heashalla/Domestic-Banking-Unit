@@ -29,38 +29,46 @@ def sri_lanka_flag_background():
         }
 
         [data-testid="stSidebar"] {
-            background: linear-gradient(135deg, #f0f0f0 20%, #e0e0e0 80%); /* Example: Light grey gradient */
-            border: 1px solid #8D1B1B;
-            border-radius: 10px;
+            background: linear-gradient(
+                135deg,
+                #c49a6c 20%,
+                #FFD700 50%,
+                #c49a6c 100%
+            );
+            border: 2px solid #8D1B1B;
+            border-radius: 20px; /* slightly more rounded */
             padding: 20px;
-            margin: 60px 10px 10px 10px;
-            color: #333; /* Dark grey default text */
-            font-weight: normal;
-            font-family: "Arial", sans-serif; /* Modern sans-serif default */
+            margin: 60px 10px 10px 10px; /* top margin added */
+        }
+
+        [data-testid="stSidebar"] * {
+            color: #8D1B1B !important; /* Force red color on all elements within the sidebar */
+            font-family: "Times New Roman", serif !important; /* Force Times New Roman font */
         }
 
         [data-testid="stSidebar"] h3,
-        [data-testid="stSidebar"] h4 {
-            color: #8D1B1B !important; /* Red for headings */
+        [data-testid="stSidebar"] h4,
+        [data-testid="stSidebar"] h5,
+        [data-testid="stSidebar"] h6,
+        [data-testid="stSidebar"] h7 {
+            color: #8D1B1B !important; /* Ensure headings are also red */
             font-family: "Times New Roman", serif !important;
-            font-weight: bold;
-            margin-top: 1em;
         }
 
-        [data-testid="stSidebar"] label {
-            color: #555; /* Slightly lighter grey for labels */
+        [data-testid="stSidebar"] div > label {
+            color: #8D1B1B !important; /* Target labels for radio buttons and selectboxes */
+            font-family: "Times New Roman", serif !important;
         }
 
         [data-testid="stSidebar"] button {
-            color: white;
-            background-color: #8D1B1B;
-            border: none;
-            border-radius: 5px;
-            padding: 0.5em 1em;
-            cursor: pointer;
+            color: #8D1B1B !important; /* Style the export button text */
+            font-family: "Times New Roman", serif !important;
         }
-        [data-testid="stSidebar"] button:hover {
-            background-color: #a02a2a;
+
+        @keyframes gradientAnimation {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
         }
         </style>
         """,
