@@ -39,16 +39,14 @@ def sri_lanka_flag_background():
     border-radius: 20px; /* slightly more rounded */
     padding: 20px;
     margin: 60px 10px 10px 10px; /* top margin added */
-    color: #8D1B1B; /* Setting default sidebar text color to red */
+    color: black;
     font-weight: bold;
-    font-family: "Times New Roman", serif; /* Setting font family to Times New Roman */
     height: auto; /* let the sidebar height grow naturally */
     position: relative; /* not sticky */
 }
 
         [data-testid="stSidebar"] .css-ng1t4o {
-            color: #8D1B1B; /* Ensuring Streamlit elements also inherit red color */
-            font-family: "Times New Roman", serif; /* Setting font family for Streamlit elements */
+            color: black;
         }
 
         @keyframes gradientAnimation {
@@ -98,7 +96,6 @@ assets_df, liabilities_df = load_data()
 
 # Sidebar Controls
 st.sidebar.header("🔧 Controls")
-st.sidebar.markdown("<style>div.row-widget.stRadio > div{flex-direction:row;}</style>", unsafe_allow_html=True)
 dataset_choice = st.sidebar.radio("Select Dataset", ["Assets", "Liabilities"])
 
 # Dataset selection
