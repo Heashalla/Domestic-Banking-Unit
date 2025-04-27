@@ -29,26 +29,40 @@ def sri_lanka_flag_background():
         }
 
         [data-testid="stSidebar"] {
-    background: linear-gradient(
-        135deg,
-        #c49a6c 20%,
-        #FFD700 50%,
-        #c49a6c 100%
-    );
-    border: 2px solid #8D1B1B;
-    border-radius: 20px; /* slightly more rounded */
-    padding: 20px;
-    margin: 60px 10px 10px 10px; /* top margin added */
-    color: #8D1B1B; /* Setting default sidebar text color to red */
-    font-weight: bold;
-    font-family: "Times New Roman", serif; /* Setting font family to Times New Roman */
-    height: auto; /* let the sidebar height grow naturally */
-    position: relative; /* not sticky */
-}
+            background: linear-gradient(
+                135deg,
+                #c49a6c 20%,
+                #FFD700 50%,
+                #c49a6c 100%
+            );
+            border: 2px solid #8D1B1B;
+            border-radius: 20px; /* slightly more rounded */
+            padding: 20px;
+            margin: 60px 10px 10px 10px; /* top margin added */
+        }
 
-        [data-testid="stSidebar"] .css-ng1t4o {
-            color: #8D1B1B; /* Ensuring Streamlit elements also inherit red color */
-            font-family: "Times New Roman", serif; /* Setting font family for Streamlit elements */
+        [data-testid="stSidebar"] * {
+            color: #8D1B1B !important; /* Force red color on all elements within the sidebar */
+            font-family: "Times New Roman", serif !important; /* Force Times New Roman font */
+        }
+
+        [data-testid="stSidebar"] h2,
+        [data-testid="stSidebar"] h3,
+        [data-testid="stSidebar"] h4,
+        [data-testid="stSidebar"] h5,
+        [data-testid="stSidebar"] h6 {
+            color: #8D1B1B !important; /* Ensure headings are also red */
+            font-family: "Times New Roman", serif !important;
+        }
+
+        [data-testid="stSidebar"] div > label {
+            color: #8D1B1B !important; /* Target labels for radio buttons and selectboxes */
+            font-family: "Times New Roman", serif !important;
+        }
+
+        [data-testid="stSidebar"] button {
+            color: #8D1B1B !important; /* Style the export button text */
+            font-family: "Times New Roman", serif !important;
         }
 
         @keyframes gradientAnimation {
@@ -97,7 +111,7 @@ def load_data():
 assets_df, liabilities_df = load_data()
 
 # Sidebar Controls
-st.sidebar.header("🔧 Controls")
+st.sidebar.header("Controls")
 st.sidebar.markdown("<style>div.row-widget.stRadio > div{flex-direction:row;}</style>", unsafe_allow_html=True)
 dataset_choice = st.sidebar.radio("Select Dataset", ["Assets", "Liabilities"])
 
