@@ -1,5 +1,3 @@
-# streamlit_app.py
-
 # 🚀 Imports
 import streamlit as st
 import pandas as pd
@@ -19,7 +17,7 @@ def sri_lanka_flag_background():
         .stApp {
             background: linear-gradient(
                 135deg,
-                #8D1B1B 0%,
+                #8D1B1B 20%,
                 #FFD700 25%,
                 #007847 50%,
                 #FF8200 75%,
@@ -32,7 +30,7 @@ def sri_lanka_flag_background():
         [data-testid="stSidebar"] {
     background: linear-gradient(
         135deg,
-        #c49a6c 0%,   
+        #c49a6c 20%,   
         #FFD700 50%,  
         #c49a6c 100%
     );
@@ -46,9 +44,8 @@ def sri_lanka_flag_background():
     position: relative; /* not sticky */
 }
 
-
         [data-testid="stSidebar"] .css-ng1t4o {
-            color: black; /* Force sidebar widgets text to black */
+            color: black;
         }
 
         @keyframes gradientAnimation {
@@ -61,30 +58,25 @@ def sri_lanka_flag_background():
         unsafe_allow_html=True
     )
 
-
 # 🎨 Apply Background
 sri_lanka_flag_background()
 
-# JavaScript to dynamically adjust sidebar height
+# Adjust sidebar height dynamically
 st.markdown(
     """
     <script>
     function setSidebarHeight() {
         const sidebar = document.querySelector('[data-testid="stSidebar"]');
-        const mainContent = document.querySelector('.stApp > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(2)');
-        if (sidebar && mainContent) {
-            sidebar.style.minHeight = mainContent.offsetHeight + 'px';
+        if (sidebar) {
+            sidebar.style.minHeight = (window.innerHeight - 20) + 'px';
         }
     }
     window.addEventListener('load', setSidebarHeight);
     window.addEventListener('resize', setSidebarHeight);
-    const observer = new MutationObserver(setSidebarHeight);
-    observer.observe(document.body, { childList: true, subtree: true });
     </script>
     """,
     unsafe_allow_html=True,
 )
-
 
 # 🏦 Title and Description
 st.title("🏦 🇱🇰 Sri Lanka Banks: Domestic Banking Insights")
@@ -102,7 +94,7 @@ def load_data():
 assets_df, liabilities_df = load_data()
 
 # 📦 Sidebar Controls
-st.sidebar.header("DBU")
+st.sidebar.header("🔧 Controls")
 dataset_choice = st.sidebar.radio("Select Dataset", ["Assets", "Liabilities"])
 
 # 🎯 Dataset selection
@@ -115,79 +107,113 @@ else:
 
 filter_col = "End of Period"
 
-# 📆 Sidebar Filters: Year and Month separately
+# 📆 Sidebar Filter: Select Year Only
 if filter_col in df.columns:
     df = df.dropna(subset=[filter_col])
     df['Year'] = df[filter_col].dt.year
-    df['Month'] = df[filter_col].dt.month_name()
+    df['Month'] = df[filter_col].dt.month
+    df['Month Name'] = df[filter_col].dt.month_name()
 
     selected_year = st.sidebar.selectbox("Select Year 📅", sorted(df['Year'].unique(), reverse=True))
-
-    available_months = df[df['Year'] == selected_year]['Month'].unique()
-    selected_month = st.sidebar.selectbox("Select Month 📆", sorted(available_months))
-
-    df = df[(df['Year'] == selected_year) & (df['Month'] == selected_month)]
+    df = df[df['Year'] == selected_year]
 
 # 🔑 KPI Section
-st.subheader(f"🔑 {dataset_title} Overview ({selected_month} {selected_year})")
+st.subheader(f"🔑 {dataset_title} Overview ({selected_year})")
 
 # KPI Calculations
 total_value = df.select_dtypes(include="number").sum().sum()
 average_value = df.select_dtypes(include="number").mean().mean()
-
-# Biggest Contributor
 biggest_contributor = df.select_dtypes(include="number").sum().idxmax()
 
-# Show KPIs
 col1, col2, col3 = st.columns(3)
 col1.metric("Total Value", f"Rs. {total_value:,.0f}")
 col2.metric("Average per Metric", f"Rs. {average_value:,.0f}")
 col3.metric("Top Contributor", biggest_contributor)
 
 # 📈 Charts Section
-st.subheader(f"📈 Visual Analysis of {dataset_title}")
+st.subheader(f"📈 Visual Analysis of {dataset_title} ({selected_year})")
 
 numeric_cols = df.select_dtypes(include="number").columns.tolist()
+
 if numeric_cols:
-    selected_col = st.selectbox(f"Choose a {dataset_title} metric to visualize:", numeric_cols)
+    selected_cols = st.multiselect(
+        f"Select one or more {dataset_title} metrics to visualize:", 
+        numeric_cols, 
+        default=[numeric_cols[0]]
+    )
 
-    chart1, chart2 = st.columns(2)
-    with chart1:
-        st.plotly_chart(px.line(df, x=filter_col, y=selected_col,
-                                        title=f"{selected_col} Trend Line",
-                                        template="plotly_dark",
-                                        markers=True), use_container_width=True)
+    if selected_cols:
+        fig = px.line(
+            df.sort_values(by="Month"),
+            x="Month Name",
+            y=selected_cols,
+            markers=True,
+            title=f"{', '.join(selected_cols)} Over Months - {selected_year}",
+            template="plotly_dark",
+        )
+        fig.update_layout(xaxis_title="Month", yaxis_title="Value", legend_title="Metric")
+        fig.update_xaxes(categoryorder='array', categoryarray=list(calendar.month_name)[1:])  # Correct month order
+        st.plotly_chart(fig, use_container_width=True)
 
-    with chart2:
-        st.plotly_chart(px.area(df, x=filter_col, y=selected_col,
-                                        title=f"{selected_col} Area Chart",
-                                        template="simple_white"), use_container_width=True)
+        # Box plot for distribution of selected metric
+        if len(selected_cols) == 1:
+            st.plotly_chart(
+                px.box(
+                    df,
+                    y=selected_cols[0],
+                    title=f"{selected_cols[0]} Value Distribution ({selected_year})",
+                    template="ggplot2"
+                ),
+                use_container_width=True
+            )
 
-    if df[selected_col].nunique() > 1:
-        st.plotly_chart(px.box(df, y=selected_col,
-                                        title=f"{selected_col} Value Spread",
-                                        template="ggplot2"), use_container_width=True)
 else:
     st.warning("No numeric columns available to visualize.")
 
 # 🔍 Insights Section
-st.subheader(f"🔎 Correlation & Distribution Insights")
+st.subheader(f"🔎 Correlation Insights ({selected_year})")
 
 if numeric_cols:
-    st.write("### 🔵 Correlation Heatmap")
-    fig, ax = plt.subplots(figsize=(10, 6))
-    sns.heatmap(df[numeric_cols].corr(), annot=True, cmap="coolwarm", ax=ax)
-    st.pyplot(fig)
+    corr_matrix = df[numeric_cols].corr()
 
-    if df[selected_col].sum() > 0:
-        st.write("### 🥧 Pie Chart Representation")
-        pie_df = df[[selected_col]].copy()
-        pie_df["Label"] = pie_df.index.astype(str)
-        st.plotly_chart(px.pie(pie_df, names="Label", values=selected_col,
-                                        title=f"{selected_col} Distribution"), use_container_width=True)
+    # 🔵 Plotly Heatmap
+    st.write("### 🔵 Correlation Heatmap (Plotly)")
+    fig2 = px.imshow(
+        corr_matrix,
+        text_auto=True,
+        color_continuous_scale="RdBu",
+        origin="lower",
+        title="",
+        aspect="auto",
+    )
+    fig2.update_layout(
+        margin=dict(l=20, r=20, t=30, b=20),
+        coloraxis_colorbar=dict(title="Correlation")
+    )
+    st.plotly_chart(fig2, use_container_width=True)
+
+    # 🔵 Diverging Correlation Bars
+    st.write("### 🔵 Diverging Correlation Bars")
+    reference_var = numeric_cols[0]
+    corr_unstacked = corr_matrix[reference_var].sort_values()
+
+    fig3 = px.bar(
+        corr_unstacked,
+        orientation='h',
+        color=corr_unstacked,
+        color_continuous_scale='RdBu',
+        title=f"Correlation with {reference_var}",
+    )
+    fig3.update_layout(
+        xaxis_title="Correlation Strength",
+        yaxis_title="Variable",
+        margin=dict(l=20, r=20, t=30, b=20)
+    )
+    st.plotly_chart(fig3, use_container_width=True)
 
 else:
-    st.info("No numeric data available for insights.")
+    st.info("No numeric data available for correlation analysis.")
+
 
 # 📎 Footer
 st.markdown("---")
