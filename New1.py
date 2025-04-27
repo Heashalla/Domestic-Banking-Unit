@@ -46,11 +46,11 @@ def sri_lanka_flag_background():
             font-family: "Times New Roman", serif !important; /* Force Times New Roman font */
         }
 
-        [data-testid="stSidebar"] h2,
         [data-testid="stSidebar"] h3,
         [data-testid="stSidebar"] h4,
         [data-testid="stSidebar"] h5,
-        [data-testid="stSidebar"] h6 {
+        [data-testid="stSidebar"] h6,
+        [data-testid="stSidebar"] h7 {
             color: #8D1B1B !important; /* Ensure headings are also red */
             font-family: "Times New Roman", serif !important;
         }
@@ -136,7 +136,7 @@ if filter_col in df.columns:
     df = df[df['Year'] == selected_year]
 
 # Sidebar: Export Data Option
-st.sidebar.subheader("⬇Export Data")
+st.sidebar.subheader("Export Data")
 export_format = st.sidebar.radio("Select Export Format", ["CSV", "Excel"])
 
 def download_df(dataframe, file_format):
