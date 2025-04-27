@@ -40,14 +40,14 @@ def sri_lanka_flag_background():
     border-radius: 20px; /* slightly more rounded */
     padding: 20px;
     margin: 60px 10px 10px 10px; /* top margin added */
-    color: black;
+    color: #8D1B1B; /* Setting default sidebar text color to red */
     font-weight: bold;
     height: auto; /* let the sidebar height grow naturally */
     position: relative; /* not sticky */
 }
 
         [data-testid="stSidebar"] .css-ng1t4o {
-            color: black;
+            color: #8D1B1B; /* Ensuring Streamlit elements also inherit red color */
         }
 
         @keyframes gradientAnimation {
@@ -96,7 +96,7 @@ def load_data():
 assets_df, liabilities_df = load_data()
 
 # 📦 Sidebar Controls
-st.sidebar.markdown("<h2 style='color: #8D1B1B; font-weight: bold; margin-bottom: 1.5rem;'>⚙️ Dashboard Settings</h2>", unsafe_allow_html=True)
+st.sidebar.markdown("<h2 style='font-weight: bold; margin-bottom: 1.5rem;'>⚙️ Dashboard Settings</h2>", unsafe_allow_html=True)
 
 # Add a logo or thematic image at the top (replace with your URL)
 logo_url = "YOUR_LOGO_URL_HERE"  # Replace with your image URL or leave empty
@@ -108,10 +108,10 @@ if logo_url != "YOUR_LOGO_URL_HERE":
         st.sidebar.warning(f"Error loading logo: {e}")
         st.sidebar.markdown("---")
 
-st.sidebar.markdown("<h4 style='color: #FFD700;'>📊 Data Selection</h4>", unsafe_allow_html=True)
+st.sidebar.markdown("<h4 style=''>📊 Data Selection</h4>", unsafe_allow_html=True)
 dataset_choice = st.sidebar.radio("Choose Data View:", ["Assets", "Liabilities"])
 
-st.sidebar.markdown("<h4 style='color: #FFD700; margin-top: 1.5rem;'>💾 Export Options</h4>", unsafe_allow_html=True)
+st.sidebar.markdown("<h4 style='margin-top: 1.5rem;'>💾 Export Options</h4>", unsafe_allow_html=True)
 export_format = st.sidebar.radio("Select Format:", ["CSV", "Excel"])
 
 def download_df(dataframe, file_format):
@@ -139,7 +139,7 @@ if st.sidebar.button("📤 Download Selected Data"):
         st.sidebar.warning("⚠️ Error during export.")
 
 st.sidebar.markdown("---")
-st.sidebar.markdown("<h4 style='color: #FFD700;'>🗓️ Filter by Time</h4>", unsafe_allow_html=True)
+st.sidebar.markdown("<h4 style=''>🗓️ Filter by Time</h4>", unsafe_allow_html=True)
 
 # 🎯 Dataset selection
 if dataset_choice == "Assets":

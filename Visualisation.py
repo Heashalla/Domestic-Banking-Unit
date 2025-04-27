@@ -80,7 +80,7 @@ st.markdown(
 )
 
 # Title and Description
-st.title("🇱🇰 Sri Lanka Banks: Domestic Banking Insights")
+st.title("Sri Lanka Banks: Domestic Banking Insights")
 st.markdown("_Tracking assets, loans, and financial strength from 1995 to 2025._")
 
 # Load Data
