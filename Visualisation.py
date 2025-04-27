@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import calendar
 from io import BytesIO
 
-# 🚀 Page Config (must be first Streamlit command)
+# Page Config (must be first Streamlit command)
 st.set_page_config(page_title="Sri Lanka Banks Dashboard", layout="wide")
 
 # 🇱🇰 Sri Lanka Flag Animated Background + Sidebar Styling
@@ -59,7 +59,7 @@ def sri_lanka_flag_background():
         unsafe_allow_html=True
     )
 
-# 🎨 Apply Background
+# Apply Background
 sri_lanka_flag_background()
 
 # Adjust sidebar height dynamically
@@ -79,11 +79,11 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# 🏦 Title and Description
-st.title("🏦 🇱🇰 Sri Lanka Banks: Domestic Banking Insights")
+# Title and Description
+st.title("🇱🇰 Sri Lanka Banks: Domestic Banking Insights")
 st.markdown("_Tracking assets, loans, and financial strength from 1995 to 2025._")
 
-# 📥 Load Data
+# Load Data
 @st.cache_data
 def load_data():
     assets = pd.read_csv("assets_data_cleaned.csv")
@@ -94,11 +94,11 @@ def load_data():
 
 assets_df, liabilities_df = load_data()
 
-# 📦 Sidebar Controls
+# Sidebar Controls
 st.sidebar.header("🔧 Controls")
 dataset_choice = st.sidebar.radio("Select Dataset", ["Assets", "Liabilities"])
 
-# 🎯 Dataset selection
+# Dataset selection
 if dataset_choice == "Assets":
     df = assets_df.copy()
     dataset_title = "Assets"
@@ -108,18 +108,18 @@ else:
 
 filter_col = "End of Period"
 
-# 📆 Sidebar Filter: Select Year Only
+# Sidebar Filter: Select Year Only
 if filter_col in df.columns:
     df = df.dropna(subset=[filter_col])
     df['Year'] = df[filter_col].dt.year
     df['Month'] = df[filter_col].dt.month
     df['Month Name'] = df[filter_col].dt.month_name()
 
-    selected_year = st.sidebar.selectbox("Select Year 📅", sorted(df['Year'].unique(), reverse=True))
+    selected_year = st.sidebar.selectbox("Select Year ", sorted(df['Year'].unique(), reverse=True))
     df = df[df['Year'] == selected_year]
 
-# 💾 Sidebar: Export Data Option
-st.sidebar.subheader("⬇️ Export Data")
+# Sidebar: Export Data Option
+st.sidebar.subheader("⬇Export Data")
 export_format = st.sidebar.radio("Select Export Format", ["CSV", "Excel"])
 
 def download_df(dataframe, file_format):
@@ -146,8 +146,8 @@ if st.sidebar.button("Export Selected Data"):
     else:
         st.sidebar.warning("Error during export.")
 
-# 🔑 KPI Section
-st.subheader(f"🔑 {dataset_title} Overview ({selected_year})")
+# KPI Section
+st.subheader(f" {dataset_title} Overview ({selected_year})")
 
 # KPI Calculations
 total_value = df.select_dtypes(include="number").sum().sum()
@@ -159,8 +159,8 @@ col1.metric("Total Value", f"Rs. {total_value:,.0f}")
 col2.metric("Average per Metric", f"Rs. {average_value:,.0f}")
 col3.metric("Top Contributor", biggest_contributor)
 
-# 📈 Charts Section
-st.subheader(f"📈 Visual Analysis of {dataset_title} ({selected_year})")
+# Charts Section
+st.subheader(f"Visual Analysis of {dataset_title} ({selected_year})")
 
 numeric_cols = df.select_dtypes(include="number").columns.tolist()
 
@@ -199,14 +199,14 @@ if numeric_cols:
 else:
     st.warning("No numeric columns available to visualize.")
 
-# 🔍 Insights Section
-st.subheader(f"🔎 Correlation Insights ({selected_year})")
+# Insights Section
+st.subheader(f"Correlation Insights ({selected_year})")
 
 if numeric_cols:
     corr_matrix = df[numeric_cols].corr()
 
-    # 🔵 Plotly Heatmap
-    st.write("### 🔵 Correlation Heatmap (Plotly)")
+    # Plotly Heatmap
+    st.write("###  Correlation Heatmap (Plotly)")
     fig2 = px.imshow(
         corr_matrix,
         text_auto=True,
@@ -221,8 +221,8 @@ if numeric_cols:
     )
     st.plotly_chart(fig2, use_container_width=True)
 
-    # 🔵 Diverging Correlation Bars
-    st.write("### 🔵 Diverging Correlation Bars")
+    # Diverging Correlation Bars
+    st.write("### Diverging Correlation Bars")
     reference_var = numeric_cols[0]
     corr_unstacked = corr_matrix[reference_var].sort_values()
 
