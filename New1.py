@@ -108,7 +108,11 @@ if logo_url != "YOUR_LOGO_URL_HERE":
         st.sidebar.warning(f"Error loading logo: {e}")
         st.sidebar.markdown("---")
 
+st.sidebar.markdown("<h4 style=''>📊 Data Selection</h4>", unsafe_allow_html=True)
 dataset_choice = st.sidebar.radio("Choose Data View:", ["Assets", "Liabilities"])
+
+st.sidebar.markdown("<h4 style='margin-top: 1.5rem;'>💾 Export Options</h4>", unsafe_allow_html=True)
+export_format = st.sidebar.radio("Select Format:", ["CSV", "Excel"])
 
 # 🎯 Dataset selection
 if dataset_choice == "Assets":
@@ -120,22 +124,6 @@ else:
 
 filter_col = "End of Period"
 
-# 📆 Sidebar Filter: Select Year Only
-if filter_col in df.columns:
-    df = df.dropna(subset=[filter_col])
-    df['Year'] = df[filter_col].dt.year
-    df['Month'] = df[filter_col].dt.month
-    df['Month Name'] = df[filter_col].dt.month_name()
-
-    selected_year = st.sidebar.selectbox("Choose Year:", sorted(df['Year'].unique(), reverse=True))
-    df = df[df['Year'] == selected_year]
-
-    st.sidebar.markdown("<h4 style=''>📊 Data Selection</h4>", unsafe_allow_html=True)
-
-
-st.sidebar.markdown("<h4 style='margin-top: 1.5rem;'>💾 Export Options</h4>", unsafe_allow_html=True)
-export_format = st.sidebar.radio("Select Format:", ["CSV", "Excel"])
-
 def download_df(dataframe, file_format):
     if file_format == "CSV":
         csv_buffer = dataframe.to_csv(index=False).encode('utf-8')
@@ -146,6 +134,16 @@ def download_df(dataframe, file_format):
         excel_buffer.seek(0)
         return excel_buffer, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", f"{dataset_choice.lower()}_{selected_year}.xlsx"
     return None, None, None
+
+# 📆 Sidebar Filter: Select Year Only
+if filter_col in df.columns:
+    df = df.dropna(subset=[filter_col])
+    df['Year'] = df[filter_col].dt.year
+    df['Month'] = df[filter_col].dt.month
+    df['Month Name'] = df[filter_col].dt.month_name()
+
+    selected_year = st.sidebar.selectbox("Choose Year:", sorted(df['Year'].unique(), reverse=True))
+    df = df[df['Year'] == selected_year]
 
 if st.sidebar.button("📤 Download Selected Data"):
     buffer, mime_type, filename = download_df(df, export_format)
@@ -162,7 +160,6 @@ if st.sidebar.button("📤 Download Selected Data"):
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("<h4 style=''>🗓️ Filter by Time</h4>", unsafe_allow_html=True)
-
 
 # 🔑 KPI Section
 st.subheader(f"🔑 {dataset_title} Overview ({selected_year})")
