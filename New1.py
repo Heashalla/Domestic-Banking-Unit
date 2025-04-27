@@ -6,9 +6,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import calendar
 from io import BytesIO
-from PIL import Image  # For handling images
 
-# 🚀 Page Config (must be first Streamlit command)
+# Page Config (must be first Streamlit command)
 st.set_page_config(page_title="Sri Lanka Banks Dashboard", layout="wide")
 
 # 🇱🇰 Sri Lanka Flag Animated Background + Sidebar Styling
@@ -40,14 +39,14 @@ def sri_lanka_flag_background():
     border-radius: 20px; /* slightly more rounded */
     padding: 20px;
     margin: 60px 10px 10px 10px; /* top margin added */
-    color: #8D1B1B; /* Setting default sidebar text color to red */
+    color: black;
     font-weight: bold;
     height: auto; /* let the sidebar height grow naturally */
     position: relative; /* not sticky */
 }
 
         [data-testid="stSidebar"] .css-ng1t4o {
-            color: #8D1B1B; /* Ensuring Streamlit elements also inherit red color */
+            color: black;
         }
 
         @keyframes gradientAnimation {
@@ -60,7 +59,7 @@ def sri_lanka_flag_background():
         unsafe_allow_html=True
     )
 
-# 🎨 Apply Background
+# Apply Background
 sri_lanka_flag_background()
 
 # Adjust sidebar height dynamically
@@ -80,11 +79,11 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# 🏦 Title and Description
-st.title("🏦 🇱🇰 Sri Lanka Banks: Domestic Banking Insights")
+# Title and Description
+st.title("Sri Lanka Banks: Domestic Banking Insights")
 st.markdown("_Tracking assets, loans, and financial strength from 1995 to 2025._")
 
-# 📥 Load Data
+# Load Data
 @st.cache_data
 def load_data():
     assets = pd.read_csv("assets_data_cleaned.csv")
@@ -95,26 +94,11 @@ def load_data():
 
 assets_df, liabilities_df = load_data()
 
-# 📦 Sidebar Controls
-st.sidebar.markdown("<h2 style='font-weight: bold; margin-bottom: 1.5rem;'>⚙️ Dashboard Settings</h2>", unsafe_allow_html=True)
+# Sidebar Controls
+st.sidebar.header("🔧 Controls")
+dataset_choice = st.sidebar.radio("Select Dataset", ["Assets", "Liabilities"])
 
-# Add a logo or thematic image at the top (replace with your URL)
-logo_url = "YOUR_LOGO_URL_HERE"  # Replace with your image URL or leave empty
-if logo_url != "YOUR_LOGO_URL_HERE":
-    try:
-        st.sidebar.image(logo_url, width=100)
-        st.sidebar.markdown("---")
-    except Exception as e:
-        st.sidebar.warning(f"Error loading logo: {e}")
-        st.sidebar.markdown("---")
-
-st.sidebar.markdown("<h4 style=''>📊 Data Selection</h4>", unsafe_allow_html=True)
-dataset_choice = st.sidebar.radio("Choose Data View:", ["Assets", "Liabilities"])
-
-st.sidebar.markdown("<h4 style='margin-top: 1.5rem;'>💾 Export Options</h4>", unsafe_allow_html=True)
-export_format = st.sidebar.radio("Select Format:", ["CSV", "Excel"])
-
-# 🎯 Dataset selection
+# Dataset selection
 if dataset_choice == "Assets":
     df = assets_df.copy()
     dataset_title = "Assets"
@@ -124,45 +108,46 @@ else:
 
 filter_col = "End of Period"
 
-def download_df(dataframe, file_format):
-    if file_format == "CSV":
-        csv_buffer = dataframe.to_csv(index=False).encode('utf-8')
-        return csv_buffer, "text/csv", f"{dataset_choice.lower()}_{selected_year}.csv"
-    elif file_format == "Excel":
-        excel_buffer = BytesIO()
-        dataframe.to_excel(excel_buffer, index=False, sheet_name=dataset_choice)
-        excel_buffer.seek(0)
-        return excel_buffer, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", f"{dataset_choice.lower()}_{selected_year}.xlsx"
-    return None, None, None
-
-# 📆 Sidebar Filter: Select Year Only
+# Sidebar Filter: Select Year Only
 if filter_col in df.columns:
     df = df.dropna(subset=[filter_col])
     df['Year'] = df[filter_col].dt.year
     df['Month'] = df[filter_col].dt.month
     df['Month Name'] = df[filter_col].dt.month_name()
 
-    selected_year = st.sidebar.selectbox("Choose Year:", sorted(df['Year'].unique(), reverse=True))
+    selected_year = st.sidebar.selectbox("Select Year ", sorted(df['Year'].unique(), reverse=True))
     df = df[df['Year'] == selected_year]
 
-if st.sidebar.button("📤 Download Selected Data"):
+# Sidebar: Export Data Option
+st.sidebar.subheader("⬇Export Data")
+export_format = st.sidebar.radio("Select Export Format", ["CSV", "Excel"])
+
+def download_df(dataframe, file_format):
+    if file_format == "CSV":
+        csv_buffer = dataframe.to_csv(index=False).encode('utf-8')
+        return csv_buffer, "text/csv", f"{dataset_title}_{selected_year}.csv"
+    elif file_format == "Excel":
+        excel_buffer = BytesIO()
+        dataframe.to_excel(excel_buffer, index=False, sheet_name=dataset_title)
+        excel_buffer.seek(0)
+        return excel_buffer, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", f"{dataset_title}_{selected_year}.xlsx"
+    return None, None, None
+
+if st.sidebar.button("Export Selected Data"):
     buffer, mime_type, filename = download_df(df, export_format)
     if buffer:
         st.download_button(
-            label=f"✅ Download as {export_format}",
+            label=f"Download as {export_format}",
             data=buffer,
             file_name=filename,
             mime=mime_type,
             key=f"export_button_{export_format}"
         )
     else:
-        st.sidebar.warning("⚠️ Error during export.")
+        st.sidebar.warning("Error during export.")
 
-st.sidebar.markdown("---")
-st.sidebar.markdown("<h4 style=''>🗓️ Filter by Time</h4>", unsafe_allow_html=True)
-
-# 🔑 KPI Section
-st.subheader(f"🔑 {dataset_title} Overview ({selected_year})")
+# KPI Section
+st.subheader(f" {dataset_title} Overview ({selected_year})")
 
 # KPI Calculations
 total_value = df.select_dtypes(include="number").sum().sum()
@@ -174,8 +159,8 @@ col1.metric("Total Value", f"Rs. {total_value:,.0f}")
 col2.metric("Average per Metric", f"Rs. {average_value:,.0f}")
 col3.metric("Top Contributor", biggest_contributor)
 
-# 📈 Charts Section
-st.subheader(f"📈 Visual Analysis of {dataset_title} ({selected_year})")
+# Charts Section
+st.subheader(f"Visual Analysis of {dataset_title} ({selected_year})")
 
 numeric_cols = df.select_dtypes(include="number").columns.tolist()
 
@@ -214,14 +199,14 @@ if numeric_cols:
 else:
     st.warning("No numeric columns available to visualize.")
 
-# 🔍 Insights Section
-st.subheader(f"🔎 Correlation Insights ({selected_year})")
+# Insights Section
+st.subheader(f"Correlation Insights ({selected_year})")
 
 if numeric_cols:
     corr_matrix = df[numeric_cols].corr()
 
-    # 🔵 Plotly Heatmap
-    st.write("### 🔵 Correlation Heatmap (Plotly)")
+    # Plotly Heatmap
+    st.write("###  Correlation Heatmap (Plotly)")
     fig2 = px.imshow(
         corr_matrix,
         text_auto=True,
@@ -236,8 +221,8 @@ if numeric_cols:
     )
     st.plotly_chart(fig2, use_container_width=True)
 
-    # 🔵 Diverging Correlation Bars
-    st.write("### 🔵 Diverging Correlation Bars")
+    # Diverging Correlation Bars
+    st.write("### Diverging Correlation Bars")
     reference_var = numeric_cols[0]
     corr_unstacked = corr_matrix[reference_var].sort_values()
 
@@ -262,14 +247,6 @@ else:
 # 📎 Footer
 st.markdown("---")
 st.caption("Developed for Data Science Project Lifecycle Coursework 5DATA004W | University of Westminster")
-
-# Add a thematic image at the bottom of the sidebar (replace with your URL)
-footer_image_url = "YOUR_FOOTER_IMAGE_URL_HERE"  # Replace with your image URL or leave empty
-if footer_image_url != "YOUR_FOOTER_IMAGE_URL_HERE":
-    try:
-        st.sidebar.image(footer_image_url, width=50)
-    except Exception as e:
-        st.sidebar.warning(f"Error loading footer image: {e}")
 
 # 🇱🇰 Floating Sri Lanka Flag
 st.markdown(
