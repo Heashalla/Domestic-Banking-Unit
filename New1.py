@@ -5,6 +5,7 @@ import plotly.express as px
 import seaborn as sns
 import matplotlib.pyplot as plt
 import calendar
+from io import BytesIO
 
 # 🚀 Page Config (must be first Streamlit command)
 st.set_page_config(page_title="Sri Lanka Banks Dashboard", layout="wide")
@@ -30,8 +31,8 @@ def sri_lanka_flag_background():
         [data-testid="stSidebar"] {
     background: linear-gradient(
         135deg,
-        #c49a6c 20%,   
-        #FFD700 50%,  
+        #c49a6c 20%,
+        #FFD700 50%,
         #c49a6c 100%
     );
     border: 2px solid #8D1B1B;
@@ -117,6 +118,34 @@ if filter_col in df.columns:
     selected_year = st.sidebar.selectbox("Select Year 📅", sorted(df['Year'].unique(), reverse=True))
     df = df[df['Year'] == selected_year]
 
+# 💾 Sidebar: Export Data Option
+st.sidebar.subheader("⬇️ Export Data")
+export_format = st.sidebar.radio("Select Export Format", ["CSV", "Excel"])
+
+def download_df(dataframe, file_format):
+    if file_format == "CSV":
+        csv_buffer = dataframe.to_csv(index=False).encode('utf-8')
+        return csv_buffer, "text/csv", f"{dataset_title}_{selected_year}.csv"
+    elif file_format == "Excel":
+        excel_buffer = BytesIO()
+        dataframe.to_excel(excel_buffer, index=False, sheet_name=dataset_title)
+        excel_buffer.seek(0)
+        return excel_buffer, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", f"{dataset_title}_{selected_year}.xlsx"
+    return None, None, None
+
+if st.sidebar.button("Export Selected Data"):
+    buffer, mime_type, filename = download_df(df, export_format)
+    if buffer:
+        st.download_button(
+            label=f"Download as {export_format}",
+            data=buffer,
+            file_name=filename,
+            mime=mime_type,
+            key=f"export_button_{export_format}"
+        )
+    else:
+        st.sidebar.warning("Error during export.")
+
 # 🔑 KPI Section
 st.subheader(f"🔑 {dataset_title} Overview ({selected_year})")
 
@@ -137,8 +166,8 @@ numeric_cols = df.select_dtypes(include="number").columns.tolist()
 
 if numeric_cols:
     selected_cols = st.multiselect(
-        f"Select one or more {dataset_title} metrics to visualize:", 
-        numeric_cols, 
+        f"Select one or more {dataset_title} metrics to visualize:",
+        numeric_cols,
         default=[numeric_cols[0]]
     )
 
