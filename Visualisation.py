@@ -21,8 +21,8 @@ def sri_lanka_flag_background():
                 #8D1B1B 20%,
                 #FFD700 25%,
                 #007847 50%,
-                #FF8200 75%,
-                #8D1B1B 100%
+                #FF8200 75%
+                
             );
             background-size: 400% 400%;
             animation: gradientAnimation 15s ease infinite;
@@ -159,7 +159,6 @@ col2.metric("Average per Metric", f"Rs. {average_value:,.0f}")
 col3.metric("Top Contributor", biggest_contributor)
 
 # KPI Section
-st.subheader(f" {dataset_title} Overview ({selected_year})")
 
 numeric_cols = df.select_dtypes(include="number").columns.tolist()
 
