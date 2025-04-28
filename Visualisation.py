@@ -179,7 +179,26 @@ with col_last:
         last_value_row = df[df[filter_col] == last_date]
         if not last_value_row.empty:
             last_value = last_value_row[last_value_col].values[0]
-            st.metric(label=last_date.strftime("%b %Y"), value=f"Rs. {last_value:,.2f}")
+
+            # 👇 New Part: find previous value
+            previous_date = df[df[filter_col] < last_date][filter_col].max()
+            if pd.notnull(previous_date):
+                prev_value_row = df[df[filter_col] == previous_date]
+                if not prev_value_row.empty:
+                    prev_value = prev_value_row[last_value_col].values[0]
+                    # Calculate delta
+                    delta = last_value - prev_value
+                    delta_text = f"Rs. {delta:,.2f}"
+                else:
+                    delta_text = "No previous data"
+            else:
+                delta_text = "No previous data"
+
+            st.metric(
+                label=last_date.strftime("%b %Y"),
+                value=f"Rs. {last_value:,.2f}",
+                delta=delta_text
+            )
         else:
             st.write("No data.")
     else:

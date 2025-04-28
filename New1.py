@@ -145,7 +145,6 @@ if st.sidebar.button("Export Selected Data"):
         )
     else:
         st.sidebar.warning("Error during export.")
-
 # KPI Section
 st.subheader(f" {dataset_title} Overview ({selected_year})")
 
@@ -159,10 +158,43 @@ col1.metric("Total Value", f"Rs. {total_value:,.0f}")
 col2.metric("Average per Metric", f"Rs. {average_value:,.0f}")
 col3.metric("Top Contributor", biggest_contributor)
 
-# Charts Section
-st.subheader(f"Visual Analysis of {dataset_title} ({selected_year})")
+# KPI Section
+st.subheader(f" {dataset_title} Overview ({selected_year})")
 
 numeric_cols = df.select_dtypes(include="number").columns.tolist()
+
+# 📋 Data Summary Section
+st.subheader(f"📋 {dataset_title} Data Summary")
+
+last_date = df[filter_col].max()
+frequency = "Monthly"
+date_range = f"{df[filter_col].min().strftime('%b %Y')} - {df[filter_col].max().strftime('%b %Y')}"
+
+col_last, col_freq, col_range = st.columns(3)
+
+with col_last:
+    st.markdown("#### LAST")
+    if not df.empty and numeric_cols:
+        last_value_col = numeric_cols[0]
+        last_value_row = df[df[filter_col] == last_date]
+        if not last_value_row.empty:
+            last_value = last_value_row[last_value_col].values[0]
+            st.metric(label=last_date.strftime("%b %Y"), value=f"Rs. {last_value:,.2f}")
+        else:
+            st.write("No data.")
+    else:
+        st.write("No data.")
+
+with col_freq:
+    st.markdown("#### FREQUENCY")
+    st.write(frequency)
+
+with col_range:
+    st.markdown("#### RANGE")
+    st.write(date_range)
+
+# Charts Section
+st.subheader(f"Visual Analysis of {dataset_title} ({selected_year})")
 
 if numeric_cols:
     selected_cols = st.multiselect(
