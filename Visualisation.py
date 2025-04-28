@@ -245,6 +245,25 @@ if numeric_cols:
 else:
     st.warning("No numeric columns available to visualize.")
 
+# Pie Chart Section
+st.subheader(f"🥧 {dataset_title} Distribution Pie Chart ({selected_year})")
+
+if numeric_cols:
+    pie_data = df[numeric_cols].sum().reset_index()
+    pie_data.columns = ['Category', 'Value']
+
+    fig_pie = px.pie(
+        pie_data,
+        names='Category',
+        values='Value',
+        title=f"{dataset_title} Distribution - {selected_year}",
+        template="seaborn",
+        hole=0.4  # Donut style
+    )
+    st.plotly_chart(fig_pie, use_container_width=True)
+else:
+    st.info("No numeric data available to display Pie Chart.")
+
 # Insights Section
 st.subheader(f"Correlation Insights ({selected_year})")
 
