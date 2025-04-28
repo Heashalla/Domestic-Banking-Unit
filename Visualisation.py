@@ -30,7 +30,6 @@ def sri_lanka_flag_background():
         [data-testid="stSidebar"] {
     background: linear-gradient(
         135deg,
-        #c49a6c 20%,
         #8D1B1B 20%,
         #FFD700 50%,
         #c49a6c 100%
