@@ -10,7 +10,7 @@ from io import BytesIO
 # Page Config (must be first Streamlit command)
 st.set_page_config(page_title="Sri Lanka Banks Dashboard", layout="wide")
 
-# 🇱🇰 Sri Lanka Flag Animated Background + Sidebar Styling
+# Sri Lanka Flag color shaded Background 
 def sri_lanka_flag_background():
     st.markdown(
         """
@@ -35,13 +35,13 @@ def sri_lanka_flag_background():
         #c49a6c 100%
     );
     border: 2px solid #8D1B1B;
-    border-radius: 20px; /* slightly more rounded */
+    border-radius: 20px; 
     padding: 20px;
-    margin: 60px 10px 10px 10px; /* top margin added */
+    margin: 60px 10px 10px 10px; 
     color: black;
     font-weight: bold;
-    height: auto; /* let the sidebar height grow naturally */
-    position: relative; /* not sticky */
+    height: auto; 
+    position: relative; 
 }
 
         [data-testid="stSidebar"] .css-ng1t4o {
@@ -54,16 +54,7 @@ def sri_lanka_flag_background():
             100% {background-position: 0% 50%;}
         }
         </style>
-        """,
-        unsafe_allow_html=True
-    )
 
-# Apply Background
-sri_lanka_flag_background()
-
-# Adjust sidebar height dynamically
-st.markdown(
-    """
     <script>
     function setSidebarHeight() {
         const sidebar = document.querySelector('[data-testid="stSidebar"]');
@@ -74,9 +65,12 @@ st.markdown(
     window.addEventListener('load', setSidebarHeight);
     window.addEventListener('resize', setSidebarHeight);
     </script>
-    """,
-    unsafe_allow_html=True,
-)
+        """,
+        unsafe_allow_html=True
+    )
+
+# Apply Background
+sri_lanka_flag_background()
 
 # Title and Description
 st.title("Sri Lanka Banks: Domestic Banking Insights")
