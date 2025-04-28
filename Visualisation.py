@@ -1,4 +1,4 @@
-# 🚀 Imports
+#  Imports
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -95,7 +95,7 @@ def load_data():
 assets_df, liabilities_df = load_data()
 
 # Sidebar Controls
-st.sidebar.header("🔧 Controls")
+st.sidebar.header("Controls")
 dataset_choice = st.sidebar.radio("Select Dataset", ["Assets", "Liabilities"])
 
 # Dataset selection
@@ -148,6 +148,40 @@ if st.sidebar.button("Export Selected Data"):
 
 # KPI Section
 st.subheader(f" {dataset_title} Overview ({selected_year})")
+
+# 📋 Data Summary Section
+st.subheader(f"📋 {dataset_title} Data Summary")
+
+last_date = df[filter_col].max()
+frequency = "Monthly"
+date_range = f"{df[filter_col].min().strftime('%b %Y')} - {df[filter_col].max().strftime('%b %Y')}"
+
+col_last, col_freq, col_range = st.columns(3)
+
+with col_last:
+    st.markdown("#### LAST")
+    if not df.empty and numeric_cols:
+        last_value_col = numeric_cols[0]
+        last_value_row = df[df[filter_col] == last_date]
+        if not last_value_row.empty:
+            last_value = last_value_row[last_value_col].values[0]
+            st.metric(label=last_date.strftime("%b %Y"), value=f"Rs. {last_value:,.2f}")
+        else:
+            st.write("No data.")
+    else:
+        st.write("No data.")
+
+with col_freq:
+    st.markdown("#### FREQUENCY")
+    st.write(frequency)
+
+with col_range:
+    st.markdown("#### RANGE")
+    st.write(date_range)
+
+# KPI Section
+st.subheader(f" {dataset_title} Overview ({selected_year})")
+
 
 # KPI Calculations
 total_value = df.select_dtypes(include="number").sum().sum()

@@ -1,4 +1,4 @@
-# 🚀 Imports
+#  Imports
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -29,40 +29,24 @@ def sri_lanka_flag_background():
         }
 
         [data-testid="stSidebar"] {
-            background: linear-gradient(
-                135deg,
-                #c49a6c 20%,
-                #FFD700 50%,
-                #c49a6c 100%
-            );
-            border: 2px solid #8D1B1B;
-            border-radius: 20px; /* slightly more rounded */
-            padding: 20px;
-            margin: 60px 10px 10px 10px; /* top margin added */
-        }
+    background: linear-gradient(
+        135deg,
+        #c49a6c 20%,
+        #FFD700 50%,
+        #c49a6c 100%
+    );
+    border: 2px solid #8D1B1B;
+    border-radius: 20px; /* slightly more rounded */
+    padding: 20px;
+    margin: 60px 10px 10px 10px; /* top margin added */
+    color: black;
+    font-weight: bold;
+    height: auto; /* let the sidebar height grow naturally */
+    position: relative; /* not sticky */
+}
 
-        [data-testid="stSidebar"] * {
-            color: #8D1B1B !important; /* Force red color on all elements within the sidebar */
-            font-family: "Times New Roman", serif !important; /* Force Times New Roman font */
-        }
-
-        [data-testid="stSidebar"] h3,
-        [data-testid="stSidebar"] h4,
-        [data-testid="stSidebar"] h5,
-        [data-testid="stSidebar"] h6,
-        [data-testid="stSidebar"] h7 {
-            color: #8D1B1B !important; /* Ensure headings are also red */
-            font-family: "Times New Roman", serif !important;
-        }
-
-        [data-testid="stSidebar"] div > label {
-            color: #8D1B1B !important; /* Target labels for radio buttons and selectboxes */
-            font-family: "Times New Roman", serif !important;
-        }
-
-        [data-testid="stSidebar"] button {
-            color: #8D1B1B !important; /* Style the export button text */
-            font-family: "Times New Roman", serif !important;
+        [data-testid="stSidebar"] .css-ng1t4o {
+            color: black;
         }
 
         @keyframes gradientAnimation {
@@ -112,7 +96,6 @@ assets_df, liabilities_df = load_data()
 
 # Sidebar Controls
 st.sidebar.header("Controls")
-st.sidebar.markdown("<style>div.row-widget.stRadio > div{flex-direction:row;}</style>", unsafe_allow_html=True)
 dataset_choice = st.sidebar.radio("Select Dataset", ["Assets", "Liabilities"])
 
 # Dataset selection
@@ -136,7 +119,7 @@ if filter_col in df.columns:
     df = df[df['Year'] == selected_year]
 
 # Sidebar: Export Data Option
-st.sidebar.subheader("Export Data")
+st.sidebar.subheader("⬇Export Data")
 export_format = st.sidebar.radio("Select Export Format", ["CSV", "Excel"])
 
 def download_df(dataframe, file_format):
