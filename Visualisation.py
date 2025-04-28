@@ -125,7 +125,7 @@ if filter_col in df.columns:
 st.markdown("---")
 
 # Sidebar: Export Data Option
-st.markdown("### Export Data")
+st.sidebar.markdown("### Export Data")
 export_format = st.radio("Select Export Format", ["CSV", "Excel"])
 
 def download_df(dataframe, file_format):
@@ -139,7 +139,7 @@ def download_df(dataframe, file_format):
         return excel_buffer, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", f"{dataset_title}_{selected_year}.xlsx"
     return None, None, None
 
-if st.button("Export Selected Data"):
+if st.sidebar.button("Export Selected Data"):
         buffer, mime_type, filename = download_df(df, export_format)
         if buffer:
             st.download_button(
@@ -150,7 +150,7 @@ if st.button("Export Selected Data"):
                 key=f"export_button_{export_format}"
             )
         else:
-            st.warning("Error during export.")
+            st.sidebar.warning("Error during export.")
 # KPI Section
 st.subheader(f" {dataset_title} Overview ({selected_year})")
 
