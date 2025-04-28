@@ -251,22 +251,6 @@ st.subheader(f"Correlation Insights ({selected_year})")
 if numeric_cols:
     corr_matrix = df[numeric_cols].corr()
 
-    # Plotly Heatmap
-    st.write("###  Correlation Heatmap (Plotly)")
-    fig2 = px.imshow(
-        corr_matrix,
-        text_auto=True,
-        color_continuous_scale="RdBu",
-        origin="lower",
-        title="",
-        aspect="auto",
-    )
-    fig2.update_layout(
-        margin=dict(l=20, r=20, t=30, b=20),
-        coloraxis_colorbar=dict(title="Correlation")
-    )
-    st.plotly_chart(fig2, use_container_width=True)
-
     # Diverging Correlation Bars
     st.write("### Diverging Correlation Bars")
     reference_var = numeric_cols[0]
