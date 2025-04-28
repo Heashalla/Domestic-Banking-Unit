@@ -250,7 +250,7 @@ st.subheader(f"🥧 {dataset_title} Distribution Pie Chart ({selected_year})")
 
 if numeric_cols:
     # Step 1: Exclude unwanted columns
-    excluded_cols = ['Total Assets or Liabilities', 'Year', 'Month', 'Month Name', 'End of Period']
+    excluded_cols = [ 'Year', 'Month', 'Month Name', 'End of Period']
     pie_cols = [col for col in numeric_cols if col not in excluded_cols]
 
     if pie_cols:
@@ -288,7 +288,7 @@ st.subheader(f"📊 {dataset_title} Comparison Bar Chart ({selected_year})")
 
 if numeric_cols:
     # Step 1: Exclude unwanted columns
-    excluded_cols = ['Total Assets or Liabilities', 'Year', 'Month', 'Month Name', 'End of Period']
+    excluded_cols = [ 'Year', 'Month', 'Month Name', 'End of Period']
     bar_cols = [col for col in numeric_cols if col not in excluded_cols]
 
     if bar_cols:
