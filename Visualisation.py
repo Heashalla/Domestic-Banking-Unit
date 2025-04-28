@@ -283,6 +283,26 @@ if numeric_cols:
 else:
     st.info("No numeric data available to display Pie Chart.")
 
+# Bar Chart Section
+st.subheader(f"📊 {dataset_title} Comparison Bar Chart ({selected_year})")
+
+if numeric_cols:
+    bar_data = df[numeric_cols].sum().reset_index()
+    bar_data.columns = ['Category', 'Total Value']
+
+    fig_bar = px.bar(
+        bar_data,
+        x='Category',
+        y='Total Value',
+        title=f"{dataset_title} - Category Comparison ({selected_year})",
+        color='Total Value',
+        template="plotly",
+        text_auto=True
+    )
+    fig_bar.update_layout(xaxis_tickangle=-45)
+    st.plotly_chart(fig_bar, use_container_width=True)
+else:
+    st.info("No numeric data available to display Bar Chart.")
 
 # Insights Section
 st.subheader(f"Correlation Insights ({selected_year})")
