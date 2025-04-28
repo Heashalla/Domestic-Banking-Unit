@@ -124,21 +124,22 @@ if filter_col in df.columns:
 st.markdown("---")
 
 # Sidebar: Export Data Option
-st.sidebar.markdown("### Export Data")
-export_format = st.sidebar.radio("Select Export Format", ["CSV", "Excel"])
+with st.sidebar:
+    st.markdown("### Export Data")
+    export_format = st.radio("Select Export Format", ["CSV", "Excel"])
 
-def download_df(dataframe, file_format):
-    if file_format == "CSV":
-        csv_buffer = dataframe.to_csv(index=False).encode('utf-8')
-        return csv_buffer, "text/csv", f"{dataset_title}_{selected_year}.csv"
-    elif file_format == "Excel":
-        excel_buffer = BytesIO()
-        dataframe.to_excel(excel_buffer, index=False, sheet_name=dataset_title)
-        excel_buffer.seek(0)
-        return excel_buffer, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", f"{dataset_title}_{selected_year}.xlsx"
-    return None, None, None
+    def download_df(dataframe, file_format):
+        if file_format == "CSV":
+            csv_buffer = dataframe.to_csv(index=False).encode('utf-8')
+            return csv_buffer, "text/csv", f"{dataset_title}_{selected_year}.csv"
+        elif file_format == "Excel":
+            excel_buffer = BytesIO()
+            dataframe.to_excel(excel_buffer, index=False, sheet_name=dataset_title)
+            excel_buffer.seek(0)
+            return excel_buffer, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", f"{dataset_title}_{selected_year}.xlsx"
+        return None, None, None
 
-if st.sidebar.button("Export Selected Data"):
+    if st.button("Export Selected Data"):
         buffer, mime_type, filename = download_df(df, export_format)
         if buffer:
             st.download_button(
@@ -149,7 +150,7 @@ if st.sidebar.button("Export Selected Data"):
                 key=f"export_button_{export_format}"
             )
         else:
-            st.sidebar.warning("Error during export.")
+            st.warning("Error during export.")
 # KPI Section
 st.subheader(f" {dataset_title} Overview ({selected_year})")
 

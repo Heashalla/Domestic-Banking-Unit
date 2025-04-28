@@ -94,8 +94,12 @@ st.markdown(
 )
 
 # Sidebar Controls
-st.sidebar.header("Domestic Banking Units")
-dataset_choice = st.sidebar.radio("Asset/Liability View", ["Assets", "Liabilities"])
+with st.sidebar:
+    st.markdown("## Domestic Banking Units", unsafe_allow_html=True)
+    
+    # Asset/Liability View
+    st.markdown("### Asset/Liability View")
+    dataset_choice = st.radio("", ["Assets", "Liabilities"])
 
 # Dataset selection
 if dataset_choice == "Assets":
@@ -117,8 +121,10 @@ if filter_col in df.columns:
     selected_year = st.sidebar.selectbox("Select Year ", sorted(df['Year'].unique(), reverse=True))
     df = df[df['Year'] == selected_year]
 
+st.markdown("---")
+
 # Sidebar: Export Data Option
-st.sidebar.subheader("Export Data")
+st.sidebar.markdown("### Export Data")
 export_format = st.sidebar.radio("Select Export Format", ["CSV", "Excel"])
 
 def download_df(dataframe, file_format):
@@ -133,17 +139,17 @@ def download_df(dataframe, file_format):
     return None, None, None
 
 if st.sidebar.button("Export Selected Data"):
-    buffer, mime_type, filename = download_df(df, export_format)
-    if buffer:
-        st.download_button(
-            label=f"Download as {export_format}",
-            data=buffer,
-            file_name=filename,
-            mime=mime_type,
-            key=f"export_button_{export_format}"
-        )
-    else:
-        st.sidebar.warning("Error during export.")
+        buffer, mime_type, filename = download_df(df, export_format)
+        if buffer:
+            st.download_button(
+                label=f"Download as {export_format}",
+                data=buffer,
+                file_name=filename,
+                mime=mime_type,
+                key=f"export_button_{export_format}"
+            )
+        else:
+            st.sidebar.warning("Error during export.")
 # KPI Section
 st.subheader(f" {dataset_title} Overview ({selected_year})")
 
