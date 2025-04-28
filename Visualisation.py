@@ -96,11 +96,10 @@ st.markdown(
 # Sidebar Controls
 with st.sidebar:
     st.markdown("## Domestic Banking Units", unsafe_allow_html=True)
-    st.markdown("---")
     
     # Asset/Liability View
     st.markdown("### Asset/Liability View")
-    dataset_choice = st.radio(["Assets", "Liabilities"])
+    dataset_choice = st.radio("", ["Assets", "Liabilities"])
 
 # Dataset selection
 if dataset_choice == "Assets":
