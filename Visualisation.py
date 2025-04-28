@@ -63,7 +63,7 @@ sri_lanka_flag_background()
 
 # Title and Description
 st.title("Sri Lanka Banks: Domestic Banking Insights")
-st.markdown("_Tracking assets, loans, and financial strength from 1995 to 2025._")
+st.markdown("_A Domestic Banking Unit (DBU) is typically be a bank branch or a bank division that conducts operations within the geographical boundaries of Sri Lanka and engages in LKR and residents of Sri Lanka. Tracking assets and liabilities from 1995 to 2025 regulated by Central Bank of Sri Lanka._")
 
 # Load Data
 @st.cache_data
@@ -94,8 +94,8 @@ st.markdown(
 )
 
 # Sidebar Controls
-st.sidebar.header("Controls")
-dataset_choice = st.sidebar.radio("Select Dataset", ["Assets", "Liabilities"])
+st.sidebar.header("Domestic Banking Units")
+dataset_choice = st.sidebar.radio("Asset/Liability View", ["Assets", "Liabilities"])
 
 # Dataset selection
 if dataset_choice == "Assets":
