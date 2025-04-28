@@ -62,7 +62,7 @@ def sri_lanka_flag_background():
 sri_lanka_flag_background()
 
 # Title and Description
-st.title("Sri Lanka Banks: Domestic Banking Insights")
+st.title("Sri Lanka Domestic Banking Units Insights")
 st.markdown("_A Domestic Banking Unit (DBU) is typically be a bank branch or a bank division that conducts operations within the geographical boundaries of Sri Lanka and engages in LKR and residents of Sri Lanka. Tracking assets and liabilities from 1995 to 2025 regulated by Central Bank of Sri Lanka._")
 
 # Load Data
@@ -94,8 +94,13 @@ st.markdown(
 )
 
 # Sidebar Controls
-st.sidebar.header("Domestic Banking Units")
-dataset_choice = st.sidebar.radio("Asset/Liability View", ["Assets", "Liabilities"])
+with st.sidebar:
+    st.markdown("## Domestic Banking Units", unsafe_allow_html=True)
+    st.markdown("---")
+    
+    # Asset/Liability View
+    st.markdown("### Asset/Liability View")
+    dataset_choice = st.radio("", ["Assets", "Liabilities"])
 
 # Dataset selection
 if dataset_choice == "Assets":
@@ -117,9 +122,11 @@ if filter_col in df.columns:
     selected_year = st.sidebar.selectbox("Select Year ", sorted(df['Year'].unique(), reverse=True))
     df = df[df['Year'] == selected_year]
 
+st.markdown("---")
+
 # Sidebar: Export Data Option
-st.sidebar.subheader("Export Data")
-export_format = st.sidebar.radio("Select Export Format", ["CSV", "Excel"])
+st.markdown("### Export Data")
+export_format = st.radio("Select Export Format", ["CSV", "Excel"])
 
 def download_df(dataframe, file_format):
     if file_format == "CSV":
@@ -132,18 +139,18 @@ def download_df(dataframe, file_format):
         return excel_buffer, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", f"{dataset_title}_{selected_year}.xlsx"
     return None, None, None
 
-if st.sidebar.button("Export Selected Data"):
-    buffer, mime_type, filename = download_df(df, export_format)
-    if buffer:
-        st.download_button(
-            label=f"Download as {export_format}",
-            data=buffer,
-            file_name=filename,
-            mime=mime_type,
-            key=f"export_button_{export_format}"
-        )
-    else:
-        st.sidebar.warning("Error during export.")
+if st.button("Export Selected Data"):
+        buffer, mime_type, filename = download_df(df, export_format)
+        if buffer:
+            st.download_button(
+                label=f"Download as {export_format}",
+                data=buffer,
+                file_name=filename,
+                mime=mime_type,
+                key=f"export_button_{export_format}"
+            )
+        else:
+            st.warning("Error during export.")
 # KPI Section
 st.subheader(f" {dataset_title} Overview ({selected_year})")
 

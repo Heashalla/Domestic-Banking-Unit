@@ -10,7 +10,7 @@ from io import BytesIO
 # Page Config (must be first Streamlit command)
 st.set_page_config(page_title="Sri Lanka Banks Dashboard", layout="wide")
 
-# 🇱🇰 Sri Lanka Flag Animated Background + Sidebar Styling
+# Sri Lanka Flag color shaded Background 
 def sri_lanka_flag_background():
     st.markdown(
         """
@@ -19,9 +19,9 @@ def sri_lanka_flag_background():
             background: linear-gradient(
                 135deg,
                 #8D1B1B 20%,
-                #007847 50%,
-                #FF8200 75%,
-                #EEE8AA 100%
+                #007847 75%,
+                #F5D300 80%,
+                #D34F4F 100%
             );
             background-size: 400% 400%;
             animation: gradientAnimation 15s ease infinite;
@@ -35,13 +35,13 @@ def sri_lanka_flag_background():
         #c49a6c 100%
     );
     border: 2px solid #8D1B1B;
-    border-radius: 20px; /* slightly more rounded */
+    border-radius: 20px; 
     padding: 20px;
-    margin: 60px 10px 10px 10px; /* top margin added */
+    margin: 60px 10px 10px 10px; 
     color: black;
     font-weight: bold;
-    height: auto; /* let the sidebar height grow naturally */
-    position: relative; /* not sticky */
+    height: auto; 
+    position: relative; 
 }
 
         [data-testid="stSidebar"] .css-ng1t4o {
@@ -61,6 +61,21 @@ def sri_lanka_flag_background():
 # Apply Background
 sri_lanka_flag_background()
 
+# Title and Description
+st.title("Sri Lanka Domestic Banking Units Insights")
+st.markdown("_A Domestic Banking Unit (DBU) is typically be a bank branch or a bank division that conducts operations within the geographical boundaries of Sri Lanka and engages in LKR and residents of Sri Lanka. Tracking assets and liabilities from 1995 to 2025 regulated by Central Bank of Sri Lanka._")
+
+# Load Data
+@st.cache_data
+def load_data():
+    assets = pd.read_csv("assets_data_cleaned.csv")
+    liabilities = pd.read_csv("liabilties_data_cleaned.csv")
+    assets["End of Period"] = pd.to_datetime(assets["End of Period"], errors="coerce")
+    liabilities["End of Period"] = pd.to_datetime(liabilities["End of Period"], errors="coerce")
+    return assets, liabilities
+
+assets_df, liabilities_df = load_data()
+
 # Adjust sidebar height dynamically
 st.markdown(
     """
@@ -78,24 +93,9 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Title and Description
-st.title("Sri Lanka Banks: Domestic Banking Insights")
-st.markdown("_Tracking assets, loans, and financial strength from 1995 to 2025._")
-
-# Load Data
-@st.cache_data
-def load_data():
-    assets = pd.read_csv("assets_data_cleaned.csv")
-    liabilities = pd.read_csv("liabilties_data_cleaned.csv")
-    assets["End of Period"] = pd.to_datetime(assets["End of Period"], errors="coerce")
-    liabilities["End of Period"] = pd.to_datetime(liabilities["End of Period"], errors="coerce")
-    return assets, liabilities
-
-assets_df, liabilities_df = load_data()
-
 # Sidebar Controls
-st.sidebar.header("Controls")
-dataset_choice = st.sidebar.radio("Select Dataset", ["Assets", "Liabilities"])
+st.sidebar.header("Domestic Banking Units")
+dataset_choice = st.sidebar.radio("Asset/Liability View", ["Assets", "Liabilities"])
 
 # Dataset selection
 if dataset_choice == "Assets":
@@ -118,7 +118,7 @@ if filter_col in df.columns:
     df = df[df['Year'] == selected_year]
 
 # Sidebar: Export Data Option
-st.sidebar.subheader("⬇Export Data")
+st.sidebar.subheader("Export Data")
 export_format = st.sidebar.radio("Select Export Format", ["CSV", "Excel"])
 
 def download_df(dataframe, file_format):
