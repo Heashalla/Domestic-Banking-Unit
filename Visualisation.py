@@ -54,17 +54,6 @@ def sri_lanka_flag_background():
             100% {background-position: 0% 50%;}
         }
         </style>
-
-    <script>
-    function setSidebarHeight() {
-        const sidebar = document.querySelector('[data-testid="stSidebar"]');
-        if (sidebar) {
-            sidebar.style.minHeight = (window.innerHeight - 20) + 'px';
-        }
-    }
-    window.addEventListener('load', setSidebarHeight);
-    window.addEventListener('resize', setSidebarHeight);
-    </script>
         """,
         unsafe_allow_html=True
     )
@@ -86,6 +75,23 @@ def load_data():
     return assets, liabilities
 
 assets_df, liabilities_df = load_data()
+
+# Adjust sidebar height dynamically
+st.markdown(
+    """
+    <script>
+    function setSidebarHeight() {
+        const sidebar = document.querySelector('[data-testid="stSidebar"]');
+        if (sidebar) {
+            sidebar.style.minHeight = (window.innerHeight - 20) + 'px';
+        }
+    }
+    window.addEventListener('load', setSidebarHeight);
+    window.addEventListener('resize', setSidebarHeight);
+    </script>
+    """,
+    unsafe_allow_html=True,
+)
 
 # Sidebar Controls
 st.sidebar.header("Controls")
@@ -112,7 +118,7 @@ if filter_col in df.columns:
     df = df[df['Year'] == selected_year]
 
 # Sidebar: Export Data Option
-st.sidebar.subheader("⬇Export Data")
+st.sidebar.subheader("Export Data")
 export_format = st.sidebar.radio("Select Export Format", ["CSV", "Excel"])
 
 def download_df(dataframe, file_format):
