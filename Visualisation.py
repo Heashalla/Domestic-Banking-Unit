@@ -126,7 +126,7 @@ st.markdown("---")
 
 # Sidebar: Export Data Option
 st.sidebar.markdown("### Export Data")
-export_format = st.radio("Select Export Format", ["CSV", "Excel"])
+export_format = st.sidebar.radio("Select Export Format", ["CSV", "Excel"])
 
 def download_df(dataframe, file_format):
     if file_format == "CSV":
