@@ -149,6 +149,8 @@ if st.sidebar.button("Export Selected Data"):
 # KPI Section
 st.subheader(f" {dataset_title} Overview ({selected_year})")
 
+numeric_cols = df.select_dtypes(include="number").columns.tolist()
+
 # 📋 Data Summary Section
 st.subheader(f"📋 {dataset_title} Data Summary")
 
@@ -195,8 +197,6 @@ col3.metric("Top Contributor", biggest_contributor)
 
 # Charts Section
 st.subheader(f"Visual Analysis of {dataset_title} ({selected_year})")
-
-numeric_cols = df.select_dtypes(include="number").columns.tolist()
 
 if numeric_cols:
     selected_cols = st.multiselect(
