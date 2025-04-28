@@ -20,7 +20,8 @@ def sri_lanka_flag_background():
                 135deg,
                 #8D1B1B 20%,
                 #007847 50%,
-                #EEE8AA 100%
+                #FF8200 75%,
+                #EEE8AA 50%
             );
             background-size: 400% 400%;
             animation: gradientAnimation 15s ease infinite;
