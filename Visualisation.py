@@ -145,6 +145,18 @@ if st.sidebar.button("Export Selected Data"):
         )
     else:
         st.sidebar.warning("Error during export.")
+# KPI Section
+st.subheader(f" {dataset_title} Overview ({selected_year})")
+
+# KPI Calculations
+total_value = df.select_dtypes(include="number").sum().sum()
+average_value = df.select_dtypes(include="number").mean().mean()
+biggest_contributor = df.select_dtypes(include="number").sum().idxmax()
+
+col1, col2, col3 = st.columns(3)
+col1.metric("Total Value", f"Rs. {total_value:,.0f}")
+col2.metric("Average per Metric", f"Rs. {average_value:,.0f}")
+col3.metric("Top Contributor", biggest_contributor)
 
 # KPI Section
 st.subheader(f" {dataset_title} Overview ({selected_year})")
@@ -180,20 +192,6 @@ with col_freq:
 with col_range:
     st.markdown("#### RANGE")
     st.write(date_range)
-
-# KPI Section
-st.subheader(f" {dataset_title} Overview ({selected_year})")
-
-
-# KPI Calculations
-total_value = df.select_dtypes(include="number").sum().sum()
-average_value = df.select_dtypes(include="number").mean().mean()
-biggest_contributor = df.select_dtypes(include="number").sum().idxmax()
-
-col1, col2, col3 = st.columns(3)
-col1.metric("Total Value", f"Rs. {total_value:,.0f}")
-col2.metric("Average per Metric", f"Rs. {average_value:,.0f}")
-col3.metric("Top Contributor", biggest_contributor)
 
 # Charts Section
 st.subheader(f"Visual Analysis of {dataset_title} ({selected_year})")
