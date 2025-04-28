@@ -166,51 +166,48 @@ numeric_cols = df.select_dtypes(include="number").columns.tolist()
 # 📋 Data Summary Section
 st.subheader(f"📋 {dataset_title} Data Summary")
 
+# Prepare Data for the Table
 last_date = df[filter_col].max()
 frequency = "Monthly"
 date_range = f"{df[filter_col].min().strftime('%b %Y')} - {df[filter_col].max().strftime('%b %Y')}"
 
-col_last, col_freq, col_range = st.columns(3)
+# Initialize values
+last_value_display = "No data"
+delta_text = "No previous data"
 
-with col_last:
-    st.markdown("#### LAST")
-    if not df.empty and numeric_cols:
-        last_value_col = numeric_cols[0]
-        last_value_row = df[df[filter_col] == last_date]
-        if not last_value_row.empty:
-            last_value = last_value_row[last_value_col].values[0]
+if not df.empty and numeric_cols:
+    last_value_col = numeric_cols[0]
+    last_value_row = df[df[filter_col] == last_date]
+    if not last_value_row.empty:
+        last_value = last_value_row[last_value_col].values[0]
 
-            # 👇 New Part: find previous value
-            previous_date = df[df[filter_col] < last_date][filter_col].max()
-            if pd.notnull(previous_date):
-                prev_value_row = df[df[filter_col] == previous_date]
-                if not prev_value_row.empty:
-                    prev_value = prev_value_row[last_value_col].values[0]
-                    # Calculate delta
-                    delta = last_value - prev_value
-                    delta_text = f"Rs. {delta:,.2f}"
-                else:
-                    delta_text = "No previous data"
+        # Find previous value
+        previous_date = df[df[filter_col] < last_date][filter_col].max()
+        if pd.notnull(previous_date):
+            prev_value_row = df[df[filter_col] == previous_date]
+            if not prev_value_row.empty:
+                prev_value = prev_value_row[last_value_col].values[0]
+                delta = last_value - prev_value
+                delta_text = f"Rs. {delta:,.2f}"
             else:
                 delta_text = "No previous data"
-
-            st.metric(
-                label=last_date.strftime("%b %Y"),
-                value=f"Rs. {last_value:,.2f}",
-                delta=delta_text
-            )
         else:
-            st.write("No data.")
-    else:
-        st.write("No data.")
+            delta_text = "No previous data"
 
-with col_freq:
-    st.markdown("#### FREQUENCY")
-    st.write(frequency)
+        last_value_display = f"Rs. {last_value:,.2f}"
 
-with col_range:
-    st.markdown("#### RANGE")
-    st.write(date_range)
+# 📋 Create a clean summary DataFrame
+summary_df = pd.DataFrame({
+    "Category": ["LAST", "FREQUENCY", "RANGE"],
+    "Details": [
+        f"{last_date.strftime('%b %Y')}: {last_value_display} (Δ {delta_text})",
+        frequency,
+        date_range
+    ]
+})
+
+# 📋 Display as Table
+st.table(summary_df)
 
 # Charts Section
 st.subheader(f"Visual Analysis of {dataset_title} ({selected_year})")
