@@ -250,7 +250,7 @@ st.subheader(f"🥧 {dataset_title} Distribution Pie Chart ({selected_year})")
 
 if numeric_cols:
     # Step 1: Exclude unwanted columns
-    excluded_cols = ['Total Assets or Liabilities', 'Year', 'Month', 'Month Name', 'End of Period']
+    excluded_cols = [ 'Year', 'Month', 'Month Name', 'End of Period']
     pie_cols = [col for col in numeric_cols if col not in excluded_cols]
 
     if pie_cols:
@@ -282,6 +282,34 @@ if numeric_cols:
         st.info("No valid financial data available for Pie Chart.")
 else:
     st.info("No numeric data available to display Pie Chart.")
+
+# 📊 Bar Chart Section
+st.subheader(f"📊 {dataset_title} Comparison Bar Chart ({selected_year})")
+
+if numeric_cols:
+    # Step 1: Exclude unwanted columns
+    excluded_cols = [ 'Year', 'Month', 'Month Name', 'End of Period']
+    bar_cols = [col for col in numeric_cols if col not in excluded_cols]
+
+    if bar_cols:
+        bar_data = df[bar_cols].sum().reset_index()
+        bar_data.columns = ['Category', 'Total Value']
+
+        fig_bar = px.bar(
+            bar_data,
+            x='Category',
+            y='Total Value',
+            title=f"{dataset_title} - Category Comparison ({selected_year})",
+            color='Total Value',
+            template="plotly",
+            text_auto=True
+        )
+        fig_bar.update_layout(xaxis_tickangle=-45)
+        st.plotly_chart(fig_bar, use_container_width=True)
+    else:
+        st.info("No valid financial data available to display Bar Chart.")
+else:
+    st.info("No numeric data available to display Bar Chart.")
 
 
 # Insights Section
