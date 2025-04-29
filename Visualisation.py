@@ -170,7 +170,7 @@ col2.metric("Average Value per Metric", f"Rs. {average_value:,.0f}")
 col3.metric("Primary Contributor", biggest_contributor)
 
 # Data Summary Section
-st.subheader(f"{dataset_title} Summary Overview")
+st.subheader(f"{dataset_title} Summary Overview  ({selected_year})")
 
 # Prepare Data for the Table
 last_date = df[filter_col].max()
