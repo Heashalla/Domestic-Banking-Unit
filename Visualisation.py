@@ -170,7 +170,7 @@ col2.metric("Average Value per Metric", f"Rs. {average_value:,.0f}")
 col3.metric("Primary Contributor", biggest_contributor)
 
 # Data Summary Section
-st.subheader(f"{dataset_title} Summary Overview  ({selected_year})")
+st.subheader(f"{dataset_title} Summary Overview")
 
 # Prepare Data for the Table
 last_date = df[filter_col].max()
@@ -219,7 +219,7 @@ summary_df.index = [''] * len(summary_df)
 st.table(summary_df)
 
 # Charts Section
-st.subheader(f"Monthly Trends in {dataset_title} ({selected_year})")
+st.subheader(f"Monthly Trends in {dataset_title}")
 
 if numeric_cols:
     selected_cols = st.multiselect(
@@ -247,7 +247,7 @@ if numeric_cols:
                 px.box(
                     df,
                     y=selected_cols[0],
-                    title=f"{selected_cols[0]} Value Distribution ({selected_year})",
+                    title=f"{selected_cols[0]} Value Distribution",
                     template="ggplot2"
                 ),
                 use_container_width=True
@@ -257,7 +257,7 @@ else:
     st.warning("No numeric columns available to visualize.")
 
 # Separate Pie Charts for Assets and Liabilities
-st.subheader(f"{dataset_title} Distribution Pie Chart ({selected_year})")
+st.subheader(f"{dataset_title} Distribution Pie Chart")
 
 if numeric_cols:
     # Step 1: Exclude unwanted columns
@@ -295,7 +295,7 @@ else:
     st.info("No numeric data available to display Pie Chart.")
 
 # Bar Chart Section
-st.subheader(f" {dataset_title} Comparing Total Values by category  ({selected_year})")
+st.subheader(f" {dataset_title} Comparing Total Values by category")
 
 if numeric_cols:
     # Step 1: Exclude unwanted columns
@@ -324,7 +324,7 @@ else:
 
 
 # Insights Section
-st.subheader(f"Correlation Insights ({selected_year}) - Diverging Correlation Bars")
+st.subheader(f"Correlation Insights - Diverging Correlation Bars")
 
 if numeric_cols:
     corr_matrix = df[numeric_cols].corr()
