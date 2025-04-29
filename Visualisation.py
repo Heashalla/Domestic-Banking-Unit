@@ -255,12 +255,13 @@ if numeric_cols:
 else:
     st.warning("No numeric columns available to visualize.")
 
-# Separate Pie Charts for Assets and Liabilities
-st.subheader(f"{dataset_title} Propotional Breakdown by Category ({selected_year})")
+# 🥧 Separate Pie Charts for Assets and Liabilities
+st.subheader(f"🥧 {dataset_title} Distribution Pie Chart ({selected_year})")
 
 if numeric_cols:
     # Step 1: Exclude unwanted columns
     excluded_cols = [ 'Year', 'Month', 'Month Name', 'End of Period']
+    pie_cols = [col for col in numeric_cols if col not in excluded_cols]
 
     if pie_cols:
         pie_data = df[pie_cols].sum().reset_index()
