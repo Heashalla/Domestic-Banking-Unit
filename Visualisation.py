@@ -261,12 +261,11 @@ st.subheader(f"{dataset_title} Propotional Breakdown by Category ({selected_year
 if numeric_cols:
     # Step 1: Exclude unwanted columns
     excluded_cols = [ 'Year', 'Month', 'Month Name', 'End of Period']
-    pie_cols = [col for col in numeric_cols if col not in excluded_cols]
 
     if pie_cols:
         pie_data = df[pie_cols].sum().reset_index()
         pie_data.columns = ['Category', 'Value']
-        
+
         if dataset_choice == "Assets":
             fig_pie_assets = px.pie(
                 pie_data,
