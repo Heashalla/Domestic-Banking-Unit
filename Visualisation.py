@@ -169,8 +169,8 @@ col1.metric("Total Value", f"Rs. {total_value:,.0f}")
 col2.metric("Average Value per Metric", f"Rs. {average_value:,.0f}")
 col3.metric("Primary Contributor", biggest_contributor)
 
-# 📋 Data Summary Section
-st.subheader(f"📋 {dataset_title} Summary Overview")
+# Data Summary Section
+st.subheader(f"{dataset_title} Summary Overview")
 
 # Prepare Data for the Table
 last_date = df[filter_col].max()
@@ -204,7 +204,7 @@ if not df.empty and numeric_cols:
 delta_pct = ((last_value - prev_value) / prev_value) * 100 if prev_value != 0 else 0
 delta_text = f"Rs. {delta:,.2f} ({delta_pct:+.2f}%)"
 
-# 📋 Create a clean summary DataFrame
+# Create a summary DataFrame
 summary_df = pd.DataFrame({
     "Category": ["LAST", "FREQUENCY", "RANGE"],
     "Details": [
@@ -214,7 +214,7 @@ summary_df = pd.DataFrame({
     ]
 })
 
-# 📋 Display as Table
+# Display as Table
 st.table(summary_df)
 
 # Charts Section
@@ -255,8 +255,8 @@ if numeric_cols:
 else:
     st.warning("No numeric columns available to visualize.")
 
-# 🥧 Separate Pie Charts for Assets and Liabilities
-st.subheader(f"🥧 {dataset_title} Distribution Pie Chart ({selected_year})")
+# Separate Pie Charts for Assets and Liabilities
+st.subheader(f"{dataset_title} Distribution Pie Chart ({selected_year})")
 
 if numeric_cols:
     # Step 1: Exclude unwanted columns
@@ -294,7 +294,7 @@ else:
     st.info("No numeric data available to display Pie Chart.")
 
 # Bar Chart Section
-st.subheader(f" {dataset_title} Comapring Total Values by category  ({selected_year})")
+st.subheader(f" {dataset_title} Comparing Total Values by category  ({selected_year})")
 
 if numeric_cols:
     # Step 1: Exclude unwanted columns
