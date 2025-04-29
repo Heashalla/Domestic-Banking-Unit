@@ -215,7 +215,7 @@ summary_df = pd.DataFrame({
 })
 
 # Display as Table
-st.table(summary_df)
+st.dataframe(summary_df, hide_index=True)
 
 # Charts Section
 st.subheader(f"Monthly Trends in {dataset_title} ({selected_year})")
