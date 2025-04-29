@@ -155,21 +155,22 @@ with st.sidebar:
 st.subheader(f" {dataset_title} Overview ({selected_year})")
 
 # KPI Calculations
-total_value = df.select_dtypes(include="number").sum().sum()
-average_value = df.select_dtypes(include="number").mean().mean()
-biggest_contributor = df.select_dtypes(include="number").sum().idxmax()
-
-col1, col2, col3 = st.columns(3)
-col1.metric("Total Value", f"Rs. {total_value:,.0f}")
-col2.metric("Average per Metric", f"Rs. {average_value:,.0f}")
-col3.metric("Top Contributor", biggest_contributor)
-
-# KPI Section
 
 numeric_cols = df.select_dtypes(include="number").columns.tolist()
 
-# 📋 Data Summary Section
-st.subheader(f"📋 {dataset_title} Data Summary")
+total_value = df.select_dtypes(include="number").sum().sum()
+average_value = df.select_dtypes(include="number").mean().mean()
+financial_cols = [col for col in numeric_cols if col not in ['Year', 'Month']]
+biggest_contributor = df[financial_cols].sum().idxmax()
+
+
+col1, col2, col3 = st.columns(3)
+col1.metric("Total Value", f"Rs. {total_value:,.0f}")
+col2.metric("Average Value per Metric", f"Rs. {average_value:,.0f}")
+col3.metric("Primary Contributor", biggest_contributor)
+
+# Data Summary Section
+st.subheader(f"{dataset_title} Summary Overview")
 
 # Prepare Data for the Table
 last_date = df[filter_col].max()
@@ -200,8 +201,10 @@ if not df.empty and numeric_cols:
             delta_text = "No previous data"
 
         last_value_display = f"Rs. {last_value:,.2f}"
+delta_pct = ((last_value - prev_value) / prev_value) * 100 if prev_value != 0 else 0
+delta_text = f"Rs. {delta:,.2f} ({delta_pct:+.2f}%)"
 
-# 📋 Create a clean summary DataFrame
+# Create a summary DataFrame
 summary_df = pd.DataFrame({
     "Category": ["LAST", "FREQUENCY", "RANGE"],
     "Details": [
@@ -211,11 +214,12 @@ summary_df = pd.DataFrame({
     ]
 })
 
-# 📋 Display as Table
+# Display as Table
+summary_df.index = [''] * len(summary_df)  
 st.table(summary_df)
 
 # Charts Section
-st.subheader(f"Visual Analysis of {dataset_title} ({selected_year})")
+st.subheader(f"Monthly Trends in {dataset_title}")
 
 if numeric_cols:
     selected_cols = st.multiselect(
@@ -243,7 +247,7 @@ if numeric_cols:
                 px.box(
                     df,
                     y=selected_cols[0],
-                    title=f"{selected_cols[0]} Value Distribution ({selected_year})",
+                    title=f"{selected_cols[0]} Value Distribution",
                     template="ggplot2"
                 ),
                 use_container_width=True
@@ -252,8 +256,8 @@ if numeric_cols:
 else:
     st.warning("No numeric columns available to visualize.")
 
-# 🥧 Separate Pie Charts for Assets and Liabilities
-st.subheader(f"🥧 {dataset_title} Distribution Pie Chart ({selected_year})")
+# Separate Pie Charts for Assets and Liabilities
+st.subheader(f"{dataset_title} Distribution Pie Chart")
 
 if numeric_cols:
     # Step 1: Exclude unwanted columns
@@ -290,8 +294,8 @@ if numeric_cols:
 else:
     st.info("No numeric data available to display Pie Chart.")
 
-# 📊 Bar Chart Section
-st.subheader(f"📊 {dataset_title} Comparison Bar Chart ({selected_year})")
+# Bar Chart Section
+st.subheader(f" {dataset_title} Comparing Total Values by category")
 
 if numeric_cols:
     # Step 1: Exclude unwanted columns
@@ -320,13 +324,12 @@ else:
 
 
 # Insights Section
-st.subheader(f"Correlation Insights ({selected_year})")
+st.subheader(f"Correlation Insights - Diverging Correlation Bars")
 
 if numeric_cols:
     corr_matrix = df[numeric_cols].corr()
 
     # Diverging Correlation Bars
-    st.write("### Diverging Correlation Bars")
     reference_var = numeric_cols[0]
     corr_unstacked = corr_matrix[reference_var].sort_values()
 
