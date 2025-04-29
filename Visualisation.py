@@ -323,13 +323,12 @@ else:
 
 
 # Insights Section
-st.subheader(f"Correlation Insights ({selected_year})")
+st.subheader(f"Correlation Insights ({selected_year}) - Diverging Correlation Bars")
 
 if numeric_cols:
     corr_matrix = df[numeric_cols].corr()
 
     # Diverging Correlation Bars
-    st.write("### Diverging Correlation Bars")
     reference_var = numeric_cols[0]
     corr_unstacked = corr_matrix[reference_var].sort_values()
 
