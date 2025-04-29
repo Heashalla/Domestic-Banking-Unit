@@ -215,7 +215,8 @@ summary_df = pd.DataFrame({
 })
 
 # Display as Table
-st.dataframe(summary_df, hide_index=True)
+summary_df.index = [''] * len(summary_df)  
+st.table(summary_df)
 
 # Charts Section
 st.subheader(f"Monthly Trends in {dataset_title} ({selected_year})")
