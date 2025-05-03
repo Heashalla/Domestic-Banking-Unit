@@ -1,1 +1,2 @@
-# Domestic-Banking-Unit
+# Sri Lanka Commercial Bank Assets and Liabilities Dashboard
+## An interactive Streamlit dashboard showing graphed monthly data for Domestic Banking Units (DBU) of Sri Lankan commercial banks, which have been derived from the Central Bank of Sri Lanka. The dashboard helps policymakers, researchers, and the general public to explore financial parameters such as deposits, loans, and total credit since 1995 until today.
